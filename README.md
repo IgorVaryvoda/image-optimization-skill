@@ -31,6 +31,19 @@ Sirv REST API integration for image and file management.
 - **Async Jobs** - Video/spin conversion, ZIP creation, batch operations
 - **Account** - Usage stats, billing, events, folder options
 
+### sirv-ai-studio
+
+Guide for using Sirv AI Studio (www.sirv.studio), an AI-powered image and video processing platform.
+
+- **Background Processing** - Removal, replacement, object removal
+- **Image Enhancement** - Upscaling (up to 8x), AI editing
+- **Image Generation** - FLUX 2, Gemini Pro, Z-Image, Seedream
+- **Product Tools** - Lifestyle scenes, virtual try-on, color variants, alt text
+- **3D Generation** - Image to 3D (GLB, OBJ, FBX, USDZ)
+- **Video Tools** - LTX, Kling, Veo, captions
+- **Batch Processing** - Process hundreds of images at once
+- **Workflow Builder** - Visual DAG pipeline for multi-step operations
+
 ### sirv-dynamic-imaging
 
 Sirv dynamic imaging URL API for on-the-fly image transformation.
