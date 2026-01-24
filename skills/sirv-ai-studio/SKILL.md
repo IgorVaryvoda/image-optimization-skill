@@ -23,7 +23,27 @@ description: Guide for using Sirv AI Studio (www.sirv.studio), an AI-powered ima
 | Batch remove BG | `sirv_batch_remove_background` | `images` array |
 | Check credits | `sirv_get_usage` | none |
 
-**Only direct users to www.sirv.studio if MCP tools are NOT available.**
+### If MCP Tools Are NOT Available
+
+Help the user install the Sirv AI MCP server. Add to project `.mcp.json` or `~/.claude.json`:
+
+```json
+{
+  "mcpServers": {
+    "sirv-ai": {
+      "command": "npx",
+      "args": ["-y", "sirv-ai-mcp-server"],
+      "env": {
+        "SIRV_AI_BASE_URL": "https://www.sirv.studio"
+      }
+    }
+  }
+}
+```
+
+Then restart Claude Code. User will need to authorize with their Sirv AI Studio account on first use.
+
+**Only direct users to www.sirv.studio if they don't want to set up MCP.**
 
 ---
 
@@ -368,24 +388,22 @@ Sirv AI Studio provides an MCP (Model Context Protocol) server for AI assistants
 
 ### MCP Server Setup
 
-**Claude Desktop (`claude_desktop_config.json`):**
+**Claude Code (`.mcp.json` in project or `~/.claude.json` global):**
 ```json
 {
   "mcpServers": {
     "sirv-ai": {
       "command": "npx",
-      "args": ["-y", "@anthropics/model-context-protocol", "sirv-ai-studio"],
+      "args": ["-y", "sirv-ai-mcp-server"],
       "env": {
-        "SIRV_AI_API_KEY": "your-api-key"
+        "SIRV_AI_BASE_URL": "https://www.sirv.studio"
       }
     }
   }
 }
 ```
 
-**Environment Variables:**
-- `SIRV_AI_API_KEY` - Your Sirv AI Studio API key (required)
-- `SIRV_AI_BASE_URL` - Custom API endpoint (optional)
+Restart Claude Code after adding. Authorize with Sirv AI Studio account on first use.
 
 ### Best Practices
 
