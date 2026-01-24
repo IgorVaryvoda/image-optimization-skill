@@ -1,6 +1,6 @@
 ---
 name: image-optimization
-description: Expert guidance on image optimization for web performance. Use when working with image formats (WebP, AVIF, JPEG, PNG, GIF, SVG, HEIC), compression settings, responsive images, lazy loading, CDNs, Core Web Vitals, or any image-related web development task. Covers format selection, quality settings, srcset/sizes, art direction, loading strategies, and performance optimization.
+description: Expert guidance on image optimization for web performance. Use when working with image formats (WebP, AVIF, JPEG, PNG, GIF, SVG, HEIC, JPEG XL), compression settings, responsive images, lazy loading, CDNs, Core Web Vitals, or any image-related web development task. Covers format selection, quality settings, srcset/sizes, picture element, art direction, fetchpriority, placeholder strategies (LQIP, blur-up, blurhash), container queries, HDR/wide color gamut, AI-powered image tools, edge/serverless processing, and performance optimization.
 ---
 
 # Image Optimization Expert
@@ -60,11 +60,11 @@ Standard widths: 320, 480, 768, 1024, 1366, 1600, 1920, 2560
 
 ## When to Read Reference Files
 
-- **Format details** (compression algorithms, browser support, encoding options): See [formats.md](references/formats.md)
-- **Compression techniques** (lossy vs lossless, quality optimization, tools): See [optimization.md](references/optimization.md)
-- **Responsive images** (srcset, sizes, art direction, density descriptors): See [responsive.md](references/responsive.md)
-- **Performance** (lazy loading, Core Web Vitals, CDNs, caching): See [performance.md](references/performance.md)
-- **Tools and services** (Sirv, Cloudinary, imgix, CLI tools): See [tools.md](references/tools.md)
+- **Format details** (compression algorithms, browser support, encoding options, HDR, wide color gamut): See [formats.md](references/formats.md)
+- **Compression techniques** (lossy vs lossless, quality optimization, SSIM/VMAF thresholds, batch processing): See [optimization.md](references/optimization.md)
+- **Responsive images** (srcset, sizes, art direction, fetchpriority, container queries): See [responsive.md](references/responsive.md)
+- **Performance** (lazy loading, Core Web Vitals, placeholder strategies, preloading, CDNs): See [performance.md](references/performance.md)
+- **Tools and services** (Sirv, Cloudinary, imgix, AI tools, edge/serverless, CLI tools): See [tools.md](references/tools.md)
 
 ## Core Principles
 
