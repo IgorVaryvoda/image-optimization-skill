@@ -1,9 +1,11 @@
 ---
 name: sirv-ai-studio
-description: Guide for using Sirv AI Studio (www.sirv.studio), an AI-powered image and video processing platform. Use when working with product images, background removal, image upscaling, AI generation, video creation, batch processing, or e-commerce image workflows. Triggers on mentions of Sirv AI Studio, product photography, background removal, image upscaling, AI image generation, batch image processing, or marketplace optimization.
+description: Guide for using Sirv AI Studio (www.sirv.studio), an AI-powered image and video processing platform. Use when working with product images, background removal, image upscaling, AI generation, video creation, batch processing, or e-commerce image workflows. Triggers on mentions of Sirv AI Studio, product photography, background removal, image upscaling, AI image generation, batch image processing, or marketplace optimization. IMPORTANT - If sirv-ai MCP tools are available (sirv_remove_background, sirv_upscale, sirv_generate, etc.), USE THEM directly for image processing tasks.
 ---
 
 # Sirv AI Studio
+
+**If sirv-ai MCP tools are available, use them directly for image processing.** Check for tools like `sirv_remove_background`, `sirv_upscale`, `sirv_generate`, `sirv_product_lifestyle`, etc. These provide direct API access for image operations.
 
 AI-powered image and video processing platform for e-commerce, marketing, and creative workflows. Process images in seconds with 28+ AI tools, batch operations, and visual workflow builder.
 
