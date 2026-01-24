@@ -413,3 +413,249 @@ Restart Claude Code after adding. Authorize with Sirv AI Studio account on first
 4. **Provide clear prompts** - Detailed descriptions yield better results for generation/lifestyle
 5. **Prepare images** - Remove backgrounds before lifestyle shots for best results
 6. **Chain operations** - Remove BG → Upscale → Lifestyle for complete product workflows
+
+## REST API Reference
+
+Base URL: `https://www.sirv.studio/api/zapier`
+
+All requests require: `Authorization: Bearer sk_live_YOUR_API_KEY`
+
+### Endpoints
+
+#### Account
+
+```http
+GET /me
+```
+Returns: `{id, email, credits, tier}`
+Cost: FREE
+
+#### Background Removal
+
+```http
+POST /remove-bg
+Content-Type: application/json
+
+{
+  "image_url": "https://example.com/product.jpg",
+  "model": "birefnet"
+}
+```
+Returns: `{id, image_url, credits_used}`
+Cost: 1-2 credits
+
+**Models:** `birefnet` (default), `bria`
+
+#### Image Upscaling
+
+```http
+POST /upscale
+Content-Type: application/json
+
+{
+  "image_url": "https://example.com/image.jpg",
+  "scale": 4,
+  "model": "clarity"
+}
+```
+Returns: `{id, image_url, credits_used}`
+Cost: 1-8 credits
+
+**Models:** `esrgan` (fast), `clarity` (AI-enhanced), `topaz` (premium)
+**Scale:** 2, 3, or 4
+
+#### Background Replacement
+
+```http
+POST /replace-bg
+Content-Type: application/json
+
+{
+  "image_url": "https://example.com/product.jpg",
+  "prompt": "Modern kitchen counter with marble surface",
+  "model": "flux-kontext"
+}
+```
+Cost: 3-15 credits
+
+**Models:** `bria`, `flux-kontext`, `nano-banana`
+
+#### Image-to-Image Transformation
+
+```http
+POST /image-to-image
+Content-Type: application/json
+
+{
+  "image_url": "https://example.com/image.jpg",
+  "prompt": "Transform to watercolor painting style",
+  "strength": 0.7
+}
+```
+Cost: 1-8 credits
+
+**Strength:** 0-1 (how much to transform)
+
+#### Image Generation
+
+```http
+POST /generate
+Content-Type: application/json
+
+{
+  "prompt": "Professional product photo of wireless headphones",
+  "model": "flux-kontext",
+  "aspect_ratio": "1:1"
+}
+```
+Returns: `{id, image_url, credits_used}`
+Cost: 1-10 credits
+
+**Models:** `flux-kontext`, `nano-banana`, `ideogram`, `zimage`, `gemini`, `seedream`
+**Aspect ratios:** `1:1`, `16:9`, `9:16`, `4:3`, `3:4`, `21:9`
+
+#### Video Generation
+
+```http
+POST /video-generation
+Content-Type: application/json
+
+{
+  "prompt": "Product rotating on display stand",
+  "image_url": "https://example.com/product.jpg",
+  "model": "ltx",
+  "duration": 5,
+  "aspect_ratio": "16:9"
+}
+```
+Cost: 10-80 credits
+
+**Models:** `veo31`, `ltx`, `kling`, `sora`
+
+#### 3D Model Generation
+
+```http
+POST /image-to-3d
+Content-Type: application/json
+
+{
+  "image_url": "https://example.com/product.jpg",
+  "model": "meshy",
+  "topology": "quad",
+  "enable_pbr": true
+}
+```
+Returns: Multiple formats (glb, obj, fbx, usdz)
+Cost: 2-50 credits
+
+#### Alt Text Generation
+
+```http
+POST /alt-text
+Content-Type: application/json
+
+{
+  "image_url": "https://example.com/image.jpg"
+}
+```
+Cost: 1 credit
+
+#### File Upload
+
+```http
+POST /upload
+Content-Type: multipart/form-data
+
+file: [binary data, max 10MB]
+```
+Cost: FREE
+
+#### Batch Operations
+
+```http
+POST /batch/remove-bg
+POST /batch/upscale
+POST /batch/alt-text
+Content-Type: application/json
+
+{
+  "images": [
+    {"id": "1", "image_url": "https://example.com/img1.jpg"},
+    {"id": "2", "image_url": "https://example.com/img2.jpg"}
+  ],
+  "model": "birefnet"
+}
+```
+
+Check batch status:
+```http
+GET /batch/status/{jobId}
+```
+
+### Rate Limits
+
+| Tier | Requests/Hour |
+|------|---------------|
+| Free | 20 |
+| Pro | 500 |
+| Business | 2,000 |
+
+### Code Examples
+
+#### JavaScript
+
+```javascript
+const SIRV_API = 'https://www.sirv.studio/api/zapier';
+const API_KEY = 'sk_live_YOUR_API_KEY';
+
+async function removeBackground(imageUrl) {
+  const response = await fetch(`${SIRV_API}/remove-bg`, {
+    method: 'POST',
+    headers: {
+      'Authorization': `Bearer ${API_KEY}`,
+      'Content-Type': 'application/json'
+    },
+    body: JSON.stringify({
+      image_url: imageUrl,
+      model: 'birefnet'
+    })
+  });
+  return (await response.json()).image_url;
+}
+
+async function generateImage(prompt, aspectRatio = '1:1') {
+  const response = await fetch(`${SIRV_API}/generate`, {
+    method: 'POST',
+    headers: {
+      'Authorization': `Bearer ${API_KEY}`,
+      'Content-Type': 'application/json'
+    },
+    body: JSON.stringify({
+      prompt,
+      model: 'flux-kontext',
+      aspect_ratio: aspectRatio
+    })
+  });
+  return (await response.json()).image_url;
+}
+```
+
+#### cURL
+
+```bash
+# Remove background
+curl -X POST https://www.sirv.studio/api/zapier/remove-bg \
+  -H "Authorization: Bearer sk_live_YOUR_API_KEY" \
+  -H "Content-Type: application/json" \
+  -d '{"image_url": "https://example.com/product.jpg", "model": "birefnet"}'
+
+# Generate image
+curl -X POST https://www.sirv.studio/api/zapier/generate \
+  -H "Authorization: Bearer sk_live_YOUR_API_KEY" \
+  -H "Content-Type: application/json" \
+  -d '{"prompt": "Product photo of headphones", "model": "flux-kontext", "aspect_ratio": "1:1"}'
+
+# Check credits
+curl https://www.sirv.studio/api/zapier/me \
+  -H "Authorization: Bearer sk_live_YOUR_API_KEY"
+```
