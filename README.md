@@ -31,6 +31,18 @@ Sirv REST API integration for image and file management.
 - **Async Jobs** - Background removal, video/spin conversion, ZIP creation, batch operations
 - **Account** - Usage stats, billing, events, folder options
 
+### sirv-dynamic-imaging
+
+Sirv dynamic imaging URL API for on-the-fly image transformation.
+
+- **Sizing** - Width, height, scale options, thumbnails
+- **Cropping** - Manual crop, face detection, trim, point of interest
+- **Effects** - Blur, sharpen, brightness, contrast, color tones, grayscale
+- **Text Overlays** - Custom fonts, positioning, colors, backgrounds, outlines
+- **Watermarks** - Logo placement, opacity, tiling, scaling
+- **Formats** - WebP, AVIF, optimal auto-selection, quality settings
+- **Profiles** - Reusable option presets as JSON
+
 ## Learn More
 
 [imageguide.dev/tools/claude-skill](https://imageguide.dev/tools/claude-skill/)
