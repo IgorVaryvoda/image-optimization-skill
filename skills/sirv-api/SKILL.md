@@ -1,6 +1,6 @@
 ---
 name: sirv-api
-description: Sirv REST API integration for image and file management. Use when working with Sirv CDN, uploading/downloading files to Sirv, managing image metadata, searching files, creating 360 spins, removing backgrounds, converting videos, or any Sirv API operations. Covers authentication, file operations, metadata, search queries, async jobs, and account management.
+description: Sirv REST API integration for image and file management. Use when working with Sirv CDN, uploading/downloading files to Sirv, managing image metadata, searching files, creating 360 spins, converting videos, or any Sirv API operations. Covers authentication, file operations, metadata, search queries, async jobs, and account management.
 ---
 
 # Sirv REST API
@@ -59,7 +59,6 @@ Tokens expire in 20 minutes. Request a new one before expiry.
 
 | Operation | Start | Poll |
 |-----------|-------|------|
-| Remove background | POST `/v2/files/removeBackground` | GET `/v2/files/removeBackground?id=` |
 | Spin to video | POST `/v2/files/spin2video` | Returns filename directly |
 | Video to spin | POST `/v2/files/video2spin` | Returns filename directly |
 | Create ZIP | POST `/v2/files/zip` | GET `/v2/files/zip?id=` |
@@ -70,7 +69,7 @@ Tokens expire in 20 minutes. Request a new one before expiry.
 
 - **File operations** (upload, download, copy, delete, directory listing): See [files.md](references/files.md)
 - **Metadata & search** (meta fields, search query syntax, product data): See [metadata.md](references/metadata.md)
-- **Async jobs** (background removal, video conversion, ZIP, batch ops): See [jobs.md](references/jobs.md)
+- **Async jobs** (video conversion, ZIP, batch ops): See [jobs.md](references/jobs.md)
 - **Account & stats** (usage, billing, events, settings): See [account.md](references/account.md)
 
 ## Common Patterns
@@ -103,19 +102,22 @@ await fetch('https://api.sirv.com/v2/files/search', {
 });
 ```
 
-### Remove background (async)
+### Create ZIP archive (async)
 ```javascript
 // Start job
-const { id } = await fetch('https://api.sirv.com/v2/files/removeBackground', {
+const { id } = await fetch('https://api.sirv.com/v2/files/zip', {
   method: 'POST',
   headers: { 'Authorization': `Bearer ${token}`, 'Content-Type': 'application/json' },
-  body: JSON.stringify({ filename: '/photo.jpg' })
+  body: JSON.stringify({
+    filenames: ['/images/photo1.jpg', '/images/photo2.jpg'],
+    zipFilename: '/downloads/photos.zip'
+  })
 }).then(r => r.json());
 
 // Poll until complete
 let progress = 0;
 while (progress < 100) {
-  const status = await fetch(`https://api.sirv.com/v2/files/removeBackground?id=${id}`, {
+  const status = await fetch(`https://api.sirv.com/v2/files/zip?id=${id}`, {
     headers: { 'Authorization': `Bearer ${token}` }
   }).then(r => r.json());
   progress = status.progress;

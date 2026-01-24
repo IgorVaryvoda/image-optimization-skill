@@ -2,47 +2,6 @@
 
 Async jobs return a job ID. Poll the status endpoint until `progress` reaches 100.
 
-## Background Removal
-
-Remove image background using AI.
-
-**Start job:**
-```bash
-curl -X POST "https://api.sirv.com/v2/files/removeBackground" \
-  -H "Authorization: Bearer $TOKEN" \
-  -H "Content-Type: application/json" \
-  -d '{
-    "filename": "/images/product.jpg",
-    "overwrite": false,
-    "format": "png"
-  }'
-```
-
-**Request body:**
-- `filename` (required): Source image path
-- `overwrite` (optional): Overwrite original (default: false)
-- `format` (optional): Output format - "png", "webp", "jpg" (default: "png")
-
-**Response:** `{"id": "job_id"}`
-
-**Poll status:**
-```bash
-curl "https://api.sirv.com/v2/files/removeBackground?id=job_id" \
-  -H "Authorization: Bearer $TOKEN"
-```
-
-**Response:**
-```json
-{
-  "progress": 100,
-  "result": {
-    "filename": "/images/product-removebg.png"
-  }
-}
-```
-
----
-
 ## Spin to Video
 
 Convert 360 spin to MP4 video.
@@ -255,7 +214,7 @@ async function waitForJob(endpoint, jobId, token) {
 }
 
 // Usage
-const { id } = await startRemoveBackground(filename);
-const result = await waitForJob('/v2/files/removeBackground', id, token);
+const { id } = await startZipJob(filenames);
+const result = await waitForJob('/v2/files/zip', id, token);
 console.log('Output:', result.filename);
 ```

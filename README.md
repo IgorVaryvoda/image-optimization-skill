@@ -28,7 +28,7 @@ Sirv REST API integration for image and file management.
 - **File Operations** - Upload, download, copy, delete, rename, directory listing
 - **Metadata** - Title, description, tags, product info, approval status
 - **Search** - Query files by name, date, size, metadata with Lucene-style syntax
-- **Async Jobs** - Background removal, video/spin conversion, ZIP creation, batch operations
+- **Async Jobs** - Video/spin conversion, ZIP creation, batch operations
 - **Account** - Usage stats, billing, events, folder options
 
 ### sirv-dynamic-imaging
