@@ -1,15 +1,35 @@
 ---
 name: sirv-ai-studio
-description: Guide for using Sirv AI Studio (www.sirv.studio), an AI-powered image and video processing platform. Use when working with product images, background removal, image upscaling, AI generation, video creation, batch processing, or e-commerce image workflows. Triggers on mentions of Sirv AI Studio, product photography, background removal, image upscaling, AI image generation, batch image processing, or marketplace optimization. IMPORTANT - If sirv-ai MCP tools are available (sirv_remove_background, sirv_upscale, sirv_generate, etc.), USE THEM directly for image processing tasks.
+description: Guide for using Sirv AI Studio (www.sirv.studio), an AI-powered image and video processing platform. Use when working with product images, background removal, image upscaling, AI generation, video creation, batch processing, or e-commerce image workflows. Triggers on mentions of Sirv AI Studio, product photography, background removal, image upscaling, AI image generation, batch image processing, or marketplace optimization. IMPORTANT - If sirv-ai MCP tools are available (sirv_remove_background, sirv_upscale, sirv_generate, etc.), USE THEM directly for image processing tasks instead of telling user to visit the website.
 ---
 
 # Sirv AI Studio
 
-**If sirv-ai MCP tools are available, use them directly for image processing.** Check for tools like `sirv_remove_background`, `sirv_upscale`, `sirv_generate`, `sirv_product_lifestyle`, etc. These provide direct API access for image operations.
+## IMPORTANT: Use MCP Tools When Available
 
-AI-powered image and video processing platform for e-commerce, marketing, and creative workflows. Process images in seconds with 28+ AI tools, batch operations, and visual workflow builder.
+**Before telling users to visit sirv.studio, CHECK if you have access to sirv-ai MCP tools.** If tools like `sirv_remove_background`, `sirv_upscale`, `sirv_generate` are available, USE THEM DIRECTLY to process images.
 
-## Quick Start
+### MCP Tool Quick Reference
+
+| Task | MCP Tool | Key Parameters |
+|------|----------|----------------|
+| Remove background | `sirv_remove_background` | `image_url`, `model` |
+| Replace background | `sirv_background_replace` | `image_url`, `prompt` |
+| Upscale image | `sirv_upscale` | `image_url`, `scale` (2-4) |
+| Generate image | `sirv_generate` | `prompt`, `aspect_ratio` |
+| Lifestyle scene | `sirv_product_lifestyle` | `image_url`, `scene_description` |
+| Virtual try-on | `sirv_virtual_try_on` | `person_image_url`, `garment_image_url` |
+| Get alt text | `sirv_alt_text` | `image_url` |
+| Batch remove BG | `sirv_batch_remove_background` | `images` array |
+| Check credits | `sirv_get_usage` | none |
+
+**Only direct users to www.sirv.studio if MCP tools are NOT available.**
+
+---
+
+## Web UI (Fallback)
+
+If MCP tools are not available, users can access Sirv AI Studio at www.sirv.studio:
 
 1. Upload image(s) via drag-drop or URL
 2. Select tool from sidebar
