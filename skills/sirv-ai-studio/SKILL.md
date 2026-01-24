@@ -205,3 +205,171 @@ Connect Sirv account for:
 - **Soft delete**: Recover deleted assets from trash
 - **Mobile**: Long-press for context menu actions
 - **Shortcuts**: Use keyboard shortcuts in dashboard for power workflows
+
+## MCP Server Integration
+
+Sirv AI Studio provides an MCP (Model Context Protocol) server for AI assistants like Claude, enabling natural language image processing directly in conversations.
+
+### Available MCP Tools
+
+#### Background Processing
+
+| Tool | Parameters | Cost |
+|------|------------|------|
+| `sirv_remove_background` | `image_url`, `provider` (birefnet/bria), `model`, `operating_resolution` | 1-2 |
+| `sirv_background_replace` | `image_url`, `prompt`, `ref_image_url`, `model` (bria/flux-kontext/nano-banana) | 4 |
+| `sirv_object_removal` | `image_url`, `mask_url` | 3 |
+
+**Background Removal Models:**
+- `General Use (Light)` - Fast processing
+- `General Use (Light 2K)` - Fast, higher resolution
+- `General Use (Heavy)` - Best quality (default)
+- `Matting` - For hair/fur details
+- `Portrait` - Optimized for people
+- `General Use (Dynamic)` - Adaptive
+
+**Operating Resolutions:** `1024x1024`, `2048x2048`, `2304x2304`
+
+#### Image Enhancement
+
+| Tool | Parameters | Cost |
+|------|------------|------|
+| `sirv_upscale` | `image_url`, `scale` (2-4), `model`, `prompt`, `creativity` | 2-3 |
+| `sirv_image_to_image` | `image_url`, `prompt`, `strength` (0-1), `model` | 2-3 |
+
+**Upscale Models:**
+- `esrgan` - Fast, general purpose (default)
+- `clarity` - AI-enhanced with prompt guidance
+- `topaz` - Premium quality
+
+**Image-to-Image Models:**
+- `reve-fast-edit` - Quick prompt-based edits (default)
+- `flux2-lora` - High quality transformations
+- `qwen-integrate-product` - Product integration
+
+#### Image Generation
+
+| Tool | Parameters | Cost |
+|------|------------|------|
+| `sirv_generate` | `prompt`, `model`, `aspect_ratio`, `num_images` (1-4) | 2 |
+
+**Generation Models:** `zimage` (fast), `flux2` (detailed), `gemini` (photorealistic), `seedream` (artistic)
+
+**Aspect Ratios:** `1:1`, `16:9`, `9:16`, `4:3`, `3:4`, `21:9`
+
+#### Product & E-commerce
+
+| Tool | Parameters | Cost |
+|------|------------|------|
+| `sirv_product_lifestyle` | `image_url`, `scene_description`, `ref_image_url`, `placement_type`, `position`, `num_results` | 3-15 |
+| `sirv_virtual_try_on` | `person_image_url`, `garment_image_url` | 4 |
+| `sirv_alt_text` | `image_url`, `detail_level` | 1 |
+
+**Placement Types:** `original`, `automatic` (default), `manual_placement`, `manual_padding`
+
+**Positions:** `bottom_center`, `bottom_left`, `bottom_right`, `upper_center`, `upper_left`, `upper_right`, `center_vertical`, `center_horizontal`, `left_center`, `right_center`
+
+**Alt Text Detail Levels:** `caption` (brief), `detailed-caption` (standard), `more-detailed-caption` (comprehensive)
+
+#### 3D & Video
+
+| Tool | Parameters | Cost |
+|------|------------|------|
+| `sirv_image_to_3d` | `image_url`, `model`, `topology`, `target_polycount`, `enable_pbr` | 80 |
+| `sirv_video_generation` | `prompt`, `image_url`, `model`, `duration`, `resolution`, `aspect_ratio`, `generate_audio` | Variable |
+| `sirv_depth_map` | `image_url` | FREE |
+
+**3D Models:** `meshy` (default), `meshy-multi`, `seed3d`, `trellis`, `trellis2`, `hunyuan3d`
+
+**Video Models:** `veo31` (default), `ltx`, `kling`, `sora`
+
+**Video Resolutions:** `720p`, `1080p`, `1440p`, `2160p`
+
+#### Batch Operations
+
+| Tool | Parameters | Cost |
+|------|------------|------|
+| `sirv_batch_remove_background` | `images` (array of {id, image_url}), `model` | 1-2/image |
+| `sirv_batch_upscale` | `images` (array of {id, image_url}), `scale`, `model` | 2-3/image |
+
+**Batch Limits:** Up to 100 images per request
+
+#### Account
+
+| Tool | Parameters | Returns |
+|------|------------|---------|
+| `sirv_get_usage` | None | `used`, `remaining`, `total`, `tier` |
+
+### MCP Usage Examples
+
+**Remove background from a product image:**
+```
+"Remove the background from https://example.com/product.jpg using the Heavy model"
+→ sirv_remove_background(image_url, model="General Use (Heavy)")
+```
+
+**Create lifestyle scene:**
+```
+"Place this product on a modern kitchen counter with morning light"
+→ sirv_product_lifestyle(image_url, scene_description="Modern kitchen counter with morning light")
+```
+
+**Generate product variations:**
+```
+"Generate 4 images of a minimalist water bottle on white background"
+→ sirv_generate(prompt="minimalist water bottle on white background", num_images=4)
+```
+
+**Upscale for print:**
+```
+"Upscale this image 4x using the Topaz model for print quality"
+→ sirv_upscale(image_url, scale=4, model="topaz")
+```
+
+**Virtual try-on:**
+```
+"Show this dress on the model photo"
+→ sirv_virtual_try_on(person_image_url, garment_image_url)
+```
+
+**Batch processing:**
+```
+"Remove backgrounds from all these product images"
+→ sirv_batch_remove_background(images=[{id: "1", image_url: "..."}, ...])
+```
+
+**Check credits:**
+```
+"How many credits do I have left?"
+→ sirv_get_usage()
+```
+
+### MCP Server Setup
+
+**Claude Desktop (`claude_desktop_config.json`):**
+```json
+{
+  "mcpServers": {
+    "sirv-ai": {
+      "command": "npx",
+      "args": ["-y", "@anthropics/model-context-protocol", "sirv-ai-studio"],
+      "env": {
+        "SIRV_AI_API_KEY": "your-api-key"
+      }
+    }
+  }
+}
+```
+
+**Environment Variables:**
+- `SIRV_AI_API_KEY` - Your Sirv AI Studio API key (required)
+- `SIRV_AI_BASE_URL` - Custom API endpoint (optional)
+
+### Best Practices
+
+1. **Check usage first** - Use `sirv_get_usage` before large batch operations
+2. **Use appropriate models** - Choose quality vs speed based on needs
+3. **Batch when possible** - Use batch tools for multiple images to reduce overhead
+4. **Provide clear prompts** - Detailed descriptions yield better results for generation/lifestyle
+5. **Prepare images** - Remove backgrounds before lifestyle shots for best results
+6. **Chain operations** - Remove BG → Upscale → Lifestyle for complete product workflows
