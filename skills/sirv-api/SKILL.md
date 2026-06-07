@@ -7,6 +7,15 @@ description: Sirv REST API integration for image and file management. Use when w
 
 Base URL: `https://api.sirv.com`
 
+## Official Sources First
+
+Check current Sirv docs before changing endpoint fields, path escaping, metadata field names, or pagination behavior:
+
+- `https://apidocs.sirv.com/`
+- `https://sirv.com/help/articles/search-files-with-the-api/`
+- `https://sirv.com/help/articles/add-meta-with-the-api/`
+- `https://sirv.com/help/articles/sirv-api/`
+
 ## Authentication
 
 All requests require a Bearer token from `/v2/token`:
@@ -29,6 +38,15 @@ curl https://api.sirv.com/v2/account \
 ```
 
 Tokens expire in 20 minutes. Request a new one before expiry.
+
+## Debugging Workflow
+
+1. Identify the exact endpoint and method in play.
+2. Reproduce or inspect the request body, query string, and response body.
+3. Compare the request shape against the official docs before patching code.
+4. Separate auth/token failures from Sirv payload/query failures.
+5. Preserve upstream status and useful Sirv error detail when surfacing failures.
+6. Add a focused regression test or fixture for the exact endpoint/query that failed.
 
 ## Operational Rules
 
@@ -150,3 +168,19 @@ while (progress < 100) {
   await new Promise(r => setTimeout(r, 1000));
 }
 ```
+
+## Red Flags
+
+- Changing Sirv request syntax from memory instead of current docs.
+- Flattening Sirv 400/401/403/429/5xx responses into a generic local error.
+- Treating search field names, path escaping, or page-size limits as generic Lucene behavior.
+- Fixing token acquisition and request body shape in the same step without proving which boundary failed.
+- Hiding the exact Sirv path, folder, tag, or payload involved in a failure.
+
+## Verification
+
+- Reproduce the failing request with the exact folder, tag, file path, or payload.
+- Confirm file paths are URL-encoded in query strings and escaped in search syntax where required.
+- Confirm page size, pagination, or scrolling matches Sirv's documented behavior.
+- Verify imported/uploaded files with `stat`, `meta`, `readdir`, or `search`.
+- Re-run the relevant integration/route test when this skill is used in a codebase.

@@ -51,7 +51,9 @@ async function auditTarget(target, options) {
   const images = extractElements(html, "img");
   const sources = extractElements(html, "source");
   const links = extractElements(html, "link");
+  const scripts = extractElements(html, "script");
   const cssUrls = extractCssUrls(html, baseUrl);
+  const sirvViewer = extractSirvViewerState(html, scripts, baseUrl);
   const findings = [];
 
   const preloads = links
@@ -119,8 +121,10 @@ async function auditTarget(target, options) {
     }
   }
 
+  inspectSirvViewerMarkup(sirvViewer, findings);
+
   if (options.head) {
-    await addHeadFindings(imageReports, findings);
+    await addHeadFindings(imageReports, sirvViewer, findings);
   }
 
   return {
@@ -130,6 +134,14 @@ async function auditTarget(target, options) {
     sourceCount: sources.length,
     preloadCount: preloads.length,
     cssImageCount: cssUrls.filter((url) => IMAGE_EXTENSIONS.test(url.raw)).length,
+    sirvViewerCount: sirvViewer.containers.length,
+    sirvViewerAssetCount: sirvViewer.assets.length,
+    sirvScriptCount: sirvViewer.scripts.length,
+    sirvViewer: {
+      containers: sirvViewer.containers,
+      assets: sirvViewer.assets,
+      scripts: sirvViewer.scripts
+    },
     images: imageReports,
     findings,
     summary: summarize(findings)
@@ -183,15 +195,116 @@ function extractCssUrls(html, baseUrl) {
 function parseAttrs(tag) {
   const attrs = {};
   const pattern = /([:@\w.-]+)(?:\s*=\s*(?:"([^"]*)"|'([^']*)'|([^\s"'=<>`]+)))?/g;
+  const tagNames = new Set(["div", "img", "link", "script", "source"]);
   let match;
 
   while ((match = pattern.exec(tag))) {
     const name = match[1].toLowerCase();
-    if (name === "img" || name === "source" || name === "link") continue;
+    if (tagNames.has(name)) continue;
     attrs[name] = decodeHtmlEntities(match[2] ?? match[3] ?? match[4] ?? "");
   }
 
   return attrs;
+}
+
+function extractSirvViewerState(html, scriptTags, baseUrl) {
+  const divs = extractElements(html, "div");
+  const parsedDivs = divs.map((tag, index) => ({ tag, index, attrs: parseAttrs(tag) }));
+  const hasSirvContainer = parsedDivs.some(({ attrs }) => (attrs.class || "").split(/\s+/).includes("Sirv"));
+  const containers = [];
+  const assets = [];
+  const scripts = scriptTags
+    .map((tag) => ({ tag, attrs: parseAttrs(tag) }))
+    .filter(({ attrs }) => /scripts\.sirv\.com\/sirvjs\/v3\/sirv\.js/i.test(attrs.src || ""))
+    .map(({ tag, attrs }, index) => ({
+      index: index + 1,
+      src: attrs.src || "",
+      resolvedSrc: resolveUrl(attrs.src || "", baseUrl),
+      modules: parseSirvScriptModules(attrs.src || "", baseUrl),
+      tag: compactTag(tag)
+    }));
+
+  parsedDivs.forEach(({ tag, index, attrs }) => {
+    const classes = (attrs.class || "").split(/\s+/).filter(Boolean);
+    const isSirvContainer = classes.includes("Sirv");
+    const src = attrs["data-src"] || attrs["data-bg-src"] || "";
+    const assetUrls = splitSirvAssetList(src);
+    const assetTypes = assetUrls.map((assetUrl) => inferSirvAssetType(assetUrl, attrs));
+
+    if (isSirvContainer) {
+      containers.push({
+        index: index + 1,
+        src,
+        resolvedSrc: assetUrls.map((assetUrl) => resolveUrl(assetUrl, baseUrl)).filter(Boolean),
+        assetTypes: [...new Set(assetTypes)],
+        options: attrs["data-options"] || "",
+        breakpoints: attrs["data-breakpoints"] || "",
+        hasDataAlt: Object.hasOwn(attrs, "data-alt"),
+        hasStyle: Object.hasOwn(attrs, "style"),
+        tag: compactTag(tag)
+      });
+    }
+
+    if (src && (isSirvContainer || hasSirvContainer || assetUrls.some(isLikelySirvViewerUrl))) {
+      assets.push({
+        index: index + 1,
+        src,
+        resolvedSrc: assetUrls.map((assetUrl) => resolveUrl(assetUrl, baseUrl)).filter(Boolean),
+        assetTypes: [...new Set(assetTypes)],
+        type: attrs["data-type"] || "",
+        options: attrs["data-options"] || "",
+        hasDataAlt: Object.hasOwn(attrs, "data-alt"),
+        tag: compactTag(tag)
+      });
+    }
+  });
+
+  return { containers, assets, scripts };
+}
+
+function isLikelySirvViewerUrl(value) {
+  if (!value) return false;
+
+  const clean = value.split(/[?#]/)[0].toLowerCase();
+  if (/\.(spin|view|glb|gltf|usdz|obj|fbx|stl|blend)$/.test(clean)) return true;
+  if (/(^https?:\/\/[^/]*sirv\.com\/|scripts\.sirv\.com|video\.sirv\.com)/i.test(value)) return true;
+  return false;
+}
+
+function splitSirvAssetList(value) {
+  if (!value) return [];
+  return value
+    .split(",")
+    .map((part) => part.trim())
+    .filter(Boolean);
+}
+
+function parseSirvScriptModules(src, baseUrl) {
+  const resolved = resolveUrl(src, baseUrl);
+  if (!/^https?:\/\//i.test(resolved || "")) return null;
+
+  const modules = new URL(resolved).searchParams.get("modules");
+  if (!modules) return null;
+  return modules
+    .split(",")
+    .map((moduleName) => moduleName.trim())
+    .filter(Boolean);
+}
+
+function inferSirvAssetType(src, attrs = {}) {
+  if ((attrs["data-type"] || "").toLowerCase() === "zoom") return "zoom";
+  if ((attrs["data-type"] || "").toLowerCase() === "static") return "static";
+  if ((attrs["data-bg-src"] || "") === src) return "background";
+
+  const clean = src.split(/[?#]/)[0].toLowerCase();
+  if (/\.spin$/.test(clean)) return "spin";
+  if (/\.view$/.test(clean)) return "smart-gallery";
+  if (/\.(mp4|m4v|webm|ogg|ogv|mov)$/.test(clean)) return "video";
+  if (/(youtube\.com|youtu\.be|vimeo\.com|player\.vimeo\.com)/i.test(src)) return "video";
+  if (/\.(glb|gltf|usdz|obj|fbx|stl|blend)$/.test(clean)) return "model";
+  if (/\.pdf$/.test(clean)) return "pdf";
+  if (IMAGE_EXTENSIONS.test(src)) return "image";
+  return "unknown";
 }
 
 function parseSrcset(srcset, baseUrl) {
@@ -347,14 +460,98 @@ function inspectSirvMarkup(label, sirv, findings) {
   }
 }
 
-async function addHeadFindings(imageReports, findings) {
-  const urls = [...new Set(imageReports.map((image) => image.resolvedSrc).filter((src) => /^https?:\/\//i.test(src)))];
+function inspectSirvViewerMarkup(sirvViewer, findings) {
+  if (sirvViewer.containers.length === 0 && sirvViewer.assets.length === 0) return;
+
+  if (sirvViewer.scripts.length === 0) {
+    findings.push({
+      severity: "error",
+      target: "sirv-media-viewer",
+      message: "Sirv `data-src`/viewer markup found but no Sirv JS script was detected",
+      value: "Expected https://scripts.sirv.com/sirvjs/v3/sirv.js"
+    });
+  }
+
+  for (const script of sirvViewer.scripts) {
+    if (!script.modules) {
+      findings.push({
+        severity: "info",
+        target: "sirv-media-viewer",
+        message: "Full Sirv JS is loaded; consider a documented `modules` bundle if this page only needs a narrow viewer feature set",
+        value: script.src
+      });
+    } else {
+      findings.push({
+        severity: "info",
+        target: "sirv-media-viewer",
+        message: "Sirv JS uses a module-limited bundle; verify modules cover every viewer asset type",
+        value: script.modules.join(", ")
+      });
+    }
+  }
+
+  const firstContainer = sirvViewer.containers[0];
+  if (firstContainer && !/autostart\s*:\s*created/i.test(firstContainer.options)) {
+    findings.push({
+      severity: "info",
+      target: `sirv-viewer[${firstContainer.index}]`,
+      message: "First Sirv viewer uses default lazy initialization; use `autostart:created` if it is above the fold or likely LCP",
+      value: firstContainer.tag
+    });
+  }
+
+  for (const container of sirvViewer.containers) {
+    if (!container.hasStyle && !/layout\.aspectRatio/i.test(container.options)) {
+      findings.push({
+        severity: "info",
+        target: `sirv-viewer[${container.index}]`,
+        message: "Sirv viewer has no inline style or `layout.aspectRatio`; verify CSS reserves stable space to prevent CLS",
+        value: container.tag
+      });
+    }
+
+    if (!container.src && !container.breakpoints && sirvViewer.assets.length === 0) {
+      findings.push({
+        severity: "warn",
+        target: `sirv-viewer[${container.index}]`,
+        message: "Sirv viewer container has no direct `data-src`; verify child assets are present after rendering",
+        value: container.tag
+      });
+    }
+  }
+
+  for (const asset of sirvViewer.assets) {
+    if (!asset.hasDataAlt && asset.assetTypes.some((type) => ["image", "zoom", "spin", "video", "model", "smart-gallery", "pdf"].includes(type))) {
+      findings.push({
+        severity: "info",
+        target: `sirv-asset[${asset.index}]`,
+        message: "Sirv viewer asset has no `data-alt`; verify Sirv file description metadata supplies accessible text",
+        value: asset.tag
+      });
+    }
+
+    if (asset.assetTypes.includes("unknown")) {
+      findings.push({
+        severity: "info",
+        target: `sirv-asset[${asset.index}]`,
+        message: "Could not infer Sirv viewer asset type; verify the URL is supported by Sirv Media Viewer",
+        value: asset.src
+      });
+    }
+  }
+}
+
+async function addHeadFindings(imageReports, sirvViewer, findings) {
+  const imageUrls = imageReports.map((image) => image.resolvedSrc);
+  const viewerUrls = sirvViewer.assets.flatMap((asset) => asset.resolvedSrc || []);
+  const urls = [...new Set([...imageUrls, ...viewerUrls].filter((src) => /^https?:\/\//i.test(src)))];
 
   for (const url of urls) {
     try {
       const response = await fetch(url, { method: "HEAD" });
       const contentType = response.headers.get("content-type") || "";
       const contentLength = Number(response.headers.get("content-length") || 0);
+      const isViewerMedia = sirvViewer.assets.some((asset) => (asset.resolvedSrc || []).includes(url));
 
       if (!response.ok) {
         findings.push({
@@ -365,7 +562,7 @@ async function addHeadFindings(imageReports, findings) {
         });
       }
 
-      if (contentType && !contentType.startsWith("image/")) {
+      if (contentType && !isViewerMedia && !contentType.startsWith("image/")) {
         findings.push({
           severity: "warn",
           target: "http",
@@ -413,6 +610,9 @@ function printMarkdown(reports) {
     console.log(`- Source elements: ${report.sourceCount}`);
     console.log(`- Image preloads: ${report.preloadCount}`);
     console.log(`- CSS image URLs: ${report.cssImageCount}`);
+    console.log(`- Sirv viewer containers: ${report.sirvViewerCount}`);
+    console.log(`- Sirv viewer assets: ${report.sirvViewerAssetCount}`);
+    console.log(`- Sirv JS scripts: ${report.sirvScriptCount}`);
     console.log(`- Findings: ${report.summary.error} error, ${report.summary.warn} warn, ${report.summary.info} info`);
 
     if (report.findings.length === 0) {

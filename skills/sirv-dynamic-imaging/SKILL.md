@@ -11,6 +11,15 @@ Base URL: `https://yourcdn.sirv.com/path/image.jpg?{options}`
 
 Prefer high-quality masters and delivery-time transformations. Sirv applies URL parameters before profile settings, and profile settings before the Default profile. Processing order is auto-crop, scale, crop, canvas, rotate, then other effects; URL parameter order does not change that order.
 
+## Official Sources First
+
+Check current Sirv docs before changing parameter names, defaults, or fallback behavior:
+
+- `https://sirv.com/help/articles/dynamic-imaging/`
+- `https://sirv.com/help/articles/dynamic-imaging/format/`
+- `https://sirv.com/help/articles/dynamic-imaging/crop/`
+- `https://sirv.com/help/articles/responsive-images-smv/`
+
 ## Quick Reference
 
 ### Sizing
@@ -185,3 +194,29 @@ Profile example:
 ```
 
 Use profiles for repeated recipes such as product cards, marketplace exports, watermarked downloads, and social previews. Keep one-off layout sizing in URL params.
+
+## Workflow
+
+1. Decide whether the transform is one-off markup, a reusable profile, or code that should use a helper/builder.
+2. Check the official docs for exact parameter names and value ranges.
+3. Preserve existing query params unless the task explicitly replaces them.
+4. Use `format=optimal` or account defaults for browser delivery unless a fixed format is required.
+5. Add or update assertions for final URL shape when the transform is business-critical.
+
+Use `../sirv-media-viewer/SKILL.md` instead when the change is about gallery behavior, zoom/spin/video/model/PDF viewing, thumbnails, fullscreen, mobile breakpoints, Sirv JS loading, viewer API/events, or SMV accessibility. Dynamic Imaging owns delivery transforms; Sirv Media Viewer owns the interactive presentation.
+
+## Red Flags
+
+- Hand-writing many repeated query strings instead of using a profile or helper.
+- Dropping existing query params, custom domains, signed URLs, or source URL behavior by accident.
+- Treating thumbnails, AI-source images, and final delivery URLs as the same transform contract.
+- Using `scale.option=ignore` unless distortion is explicitly desired.
+- Changing format, quality, crop, or upscaling defaults without visual or byte-size verification.
+
+## Verification
+
+- Confirm final URLs use documented parameter names and values.
+- Check `content-type`, `content-length`, and cache headers with `curl -I`.
+- Verify rendered dimensions are close to display size multiplied by DPR.
+- Compare desktop/mobile crops visually when using `fill`, `poi`, `face`, or manual crop params.
+- Confirm LCP images request early and below-fold images do not all load immediately.

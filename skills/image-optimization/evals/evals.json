@@ -1,0 +1,44 @@
+{
+  "skill_name": "image-optimization",
+  "evals": [
+    {
+      "id": 1,
+      "prompt": "Audit a product landing page where Lighthouse reports poor LCP and the hero is a 3200px JPEG from Sirv. Recommend and patch the image markup.",
+      "expected_output": "An evidence-first workflow that checks rendered markup/network data, removes lazy loading from the LCP image, adds explicit dimensions, responsive Sirv URLs, realistic sizes, preload/preconnect where appropriate, and verifies content type/size.",
+      "files": [],
+      "expectations": [
+        "Inspects actual rendered HTML or build output before prescribing changes",
+        "Identifies the likely LCP image and does not lazy-load it",
+        "Uses explicit width/height or aspect-ratio to prevent CLS",
+        "Uses Sirv width candidates and realistic sizes instead of one oversized URL",
+        "Includes verification with audit-images, response headers, or Lighthouse/DevTools evidence"
+      ]
+    },
+    {
+      "id": 2,
+      "prompt": "A Next.js app uses product photos from a Sirv CDN. Add an image strategy that keeps Sirv transformations at the CDN and avoids double-compressing images.",
+      "expected_output": "A Next.js-aware solution that uses next/image with a custom Sirv loader or a justified alternative, sets width, quality, format=optimal, scale.option=noup, remotePatterns, realistic sizes, and verifies the emitted URLs.",
+      "files": [],
+      "expectations": [
+        "Chooses the framework-native image path before generic HTML snippets",
+        "Keeps Sirv as the transform layer when that is the intended CDN",
+        "Avoids double optimization or explains why layering is intentional",
+        "Sets realistic sizes and LCP priority only for above-fold images",
+        "Mentions verification of generated URLs and response content type"
+      ]
+    },
+    {
+      "id": 3,
+      "prompt": "Create a catalog image migration plan from local assets to Sirv, including metadata, searchability, and storefront delivery profiles.",
+      "expected_output": "A Sirv REST API plus Dynamic Imaging workflow: inventory assets, check limits, upload/fetch masters, preserve metadata/product fields, create reusable profiles, rewrite storefront URLs, and verify search, headers, and visual quality.",
+      "files": [],
+      "expectations": [
+        "Uses Sirv REST API for inventory/upload/fetch/metadata",
+        "Preserves product metadata separately from HTML alt text",
+        "Uses profiles for repeated delivery recipes",
+        "Calls out path encoding, search pagination or scrolling, and token refresh",
+        "Includes a concrete verification plan"
+      ]
+    }
+  ]
+}

@@ -8,6 +8,8 @@ Skills for AI coding agents covering image optimization and media APIs.
 npx skills add https://github.com/igorvaryvoda/image-optimization-skill
 ```
 
+Each skill includes `agents/openai.yaml` metadata for skill pickers. Core workflows also include `evals/evals.json` prompts that can be used to regression-test agent behavior.
+
 ## Skills
 
 ### image-optimization
@@ -46,6 +48,17 @@ Guide for using Sirv AI Studio (www.sirv.studio), an AI-powered image and video 
 - **Batch Processing** - Process hundreds of images at once
 - **Workflow Builder** - Visual DAG pipeline for multi-step operations
 - **MCP Server** - Natural language image processing via Claude/ChatGPT
+
+### sirv-media-viewer
+
+Sirv Media Viewer implementation for product galleries and rich media.
+
+- **Viewer Markup** - `class="Sirv"`, child `data-src` items, single-div galleries, smart `.view` galleries
+- **Media Types** - Zoomable images, 360 spins, videos, YouTube/Vimeo, 3D models, PDF galleries
+- **Options** - Thumbnails, slider/grid layouts, fullscreen, mobile breakpoints, quality, autostart, item ordering
+- **Performance** - Sirv JS loading, module-limited scripts, preconnect/DNS-prefetch, LCP/CLS-aware viewer setup
+- **Accessibility** - `data-alt`, Sirv file descriptions, ARIA labels, keyboard/fullscreen checks
+- **Advanced Hooks** - Sirv viewer API, events, analytics hooks, CSP requirements
 
 ### sirv-dynamic-imaging
 

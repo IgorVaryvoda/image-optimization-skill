@@ -23,7 +23,7 @@ Use this reference when an image optimization task can be solved with Sirv CDN, 
 | Inventory, upload, fetch remote files, metadata, search, account limits | Sirv REST API. |
 | Background removal, upscaling, product lifestyle, generation, alt text | Sirv AI Studio/MCP/API. |
 | Automatic responsive/lazy loading without framework image components | Sirv JS. |
-| Product gallery, zoom, spin, media viewer | Sirv Media Viewer and spin/zoom docs. |
+| Product gallery, zoom, spin, video, 3D model, PDF gallery, smart gallery | Sirv Media Viewer; load `../sirv-media-viewer/SKILL.md`. |
 
 For performance work in a codebase, start with native HTML/framework markup plus Sirv transformed URLs. Add Sirv JS only when its automatic resizing/viewer behavior is actually needed.
 
@@ -202,7 +202,7 @@ import Image from "next/image";
 
 For an LCP image, use the framework's priority/preload mechanism. For below-fold images, omit priority and keep realistic `sizes`.
 
-## Sirv JS Decision Guide
+## Sirv JS And Media Viewer Decision Guide
 
 Sirv JS can automatically resize and lazy load images with:
 
@@ -218,6 +218,22 @@ Use Sirv JS when:
 - You need Sirv Media Viewer, zoom, spin, fullscreen, or gallery features.
 
 Avoid Sirv JS for the critical hero path if it delays LCP behind script execution. In component apps, native `srcset`/framework image components with Sirv URLs are often easier to verify and optimize.
+
+For product galleries, use Sirv Media Viewer instead of recreating slider/zoom/spin behavior. Keep delivery transforms in Sirv URLs/profiles, and keep viewer behavior in SMV options:
+
+```html
+<link rel="preconnect" href="https://scripts.sirv.com" crossorigin>
+<link rel="preconnect" href="https://account.sirv.com" crossorigin>
+<script src="https://scripts.sirv.com/sirvjs/v3/sirv.js"></script>
+
+<div class="Sirv" data-options="autostart:created; layout.aspectRatio:1/1; thumbnails.position:bottom">
+  <div data-src="https://account.sirv.com/products/sku-123-front.jpg" data-type="zoom" data-alt="SKU 123 front view"></div>
+  <div data-src="https://account.sirv.com/products/sku-123.spin" data-alt="SKU 123 360 spin"></div>
+  <div data-src="https://account.sirv.com/products/sku-123-demo.mp4" data-alt="SKU 123 demonstration video"></div>
+</div>
+```
+
+Use `autostart:created` only for above-fold/LCP-relevant viewers; keep default lazy behavior for viewers lower on the page. Reserve layout space with CSS, dimensions, or SMV layout/aspect-ratio options to avoid CLS.
 
 Useful Sirv JS options:
 
@@ -319,6 +335,7 @@ Confirm:
 - The rendered image dimensions are close to the displayed dimensions multiplied by DPR.
 - LCP image is not lazy and is requested early.
 - Below-fold images are not all requested at initial load.
+- Sirv Media Viewer markup has the Sirv JS script, viewer assets load with 200s, and thumbnails/fullscreen/zoom/spin/video/model interactions work at desktop and mobile breakpoints.
 - Visual quality is acceptable at desktop and mobile breakpoints.
 
 For live pages, also run:
@@ -338,3 +355,4 @@ For live pages, also run:
 - Deleting `/.processed` large-image derivatives visible through API/FTP.
 - Treating CDN metadata as a replacement for HTML `alt`.
 - Letting Next.js optimize already-optimized Sirv variants unless that layering is intentional.
+- Adding SMV `data-src` markup without loading Sirv JS, reserving viewer space, or providing `data-alt`/Sirv file descriptions.

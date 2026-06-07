@@ -9,6 +9,16 @@ description: Guide for using Sirv AI Studio (www.sirv.studio), an AI-powered ima
 
 **Before telling users to visit sirv.studio, CHECK if you have access to sirv-ai MCP tools.** If tools like `sirv_remove_background`, `sirv_upscale`, `sirv_generate` are available, USE THEM DIRECTLY to process images.
 
+## Workflow
+
+1. Decide whether the user needs AI processing, CDN delivery optimization, or both.
+2. If Sirv AI MCP tools are available, use them directly before suggesting the web UI.
+3. Check usage/credits before large or repeated batch jobs.
+4. Choose models based on speed/quality/cost and the asset type.
+5. Keep source masters, AI-generated outputs, and CDN delivery variants distinct.
+6. Store final outputs in predictable Sirv folders and preserve product metadata/alt text where relevant.
+7. Verify output URLs, visual quality, and marketplace/compliance requirements before considering the work done.
+
 ### MCP Tool Quick Reference
 
 | Task | MCP Tool | Key Parameters |
@@ -247,6 +257,22 @@ Connect Sirv account for:
 - **Soft delete**: Recover deleted assets from trash
 - **Mobile**: Long-press for context menu actions
 - **Shortcuts**: Use keyboard shortcuts in dashboard for power workflows
+
+## Red Flags
+
+- Sending users to the web UI when MCP tools are available and sufficient.
+- Running a large batch without checking credits/usage first.
+- Treating AI-upscaled or generated output as the only master without user/business approval.
+- Mixing AI-processing quality choices with storefront/CDN delivery transforms.
+- Losing product metadata, folder organization, or output provenance during batch processing.
+
+## Verification
+
+- Confirm the output image/video URLs are reachable and match the requested operation.
+- Inspect at least representative outputs from each batch/model/prompt.
+- Check transparent-background assets against light and dark backgrounds.
+- For product/lifestyle work, confirm the product identity and important details survived.
+- For marketplace workflows, run the review/validation step when available.
 
 ## MCP Server Integration
 

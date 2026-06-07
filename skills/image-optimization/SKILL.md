@@ -1,6 +1,6 @@
 ---
 name: image-optimization
-description: Expert guidance on image optimization for web performance. Use when auditing or improving image delivery, Core Web Vitals, LCP/CLS/INP, responsive images, srcset/sizes, lazy loading, preloading, CDN delivery, Sirv/Cloudinary/imgix/Vercel/Cloudflare image pipelines, format conversion, compression, alt text, product media, or image-heavy frontend code. Covers AVIF, WebP, JPEG, PNG, GIF, SVG, HEIC, JPEG XL, HDR/wide gamut, quality settings, placeholders, image audits, Sirv dynamic imaging/API workflows, and implementation verification.
+description: Expert guidance on image optimization for web performance. Use when auditing or improving image delivery, Core Web Vitals, LCP/CLS/INP, responsive images, srcset/sizes, lazy loading, preloading, CDN delivery, Sirv/Cloudinary/imgix/Vercel/Cloudflare image pipelines, format conversion, compression, alt text, product media, Sirv Media Viewer galleries/zoom/spins/videos, or image-heavy frontend code. Covers AVIF, WebP, JPEG, PNG, GIF, SVG, HEIC, JPEG XL, HDR/wide gamut, quality settings, placeholders, image audits, Sirv dynamic imaging/API/viewer workflows, and implementation verification.
 ---
 
 # Image Optimization Expert
@@ -45,6 +45,7 @@ The script checks image markup, `srcset`/`sizes`, preload hints, likely LCP mist
 | Static/project-owned images | Generate responsive variants at build time or move masters to an image CDN. |
 | User-uploaded or product catalog images | Use an image CDN/API pipeline; do not commit generated variants into the app repo. |
 | Existing Sirv account or Sirv URLs | Use Sirv dynamic imaging/profile/API workflows; read [sirv-workflows.md](references/sirv-workflows.md). |
+| Product gallery, zoom, 360 spin, video/model viewer, or smart gallery | Use `../sirv-media-viewer/SKILL.md` before hand-building gallery behavior. |
 | Next.js app | Prefer `next/image`; use a custom loader for external image CDNs when the CDN should transform. |
 | CSS background hero | Consider replacing with semantic `<img>`/`picture`; if it must remain CSS, use `image-set()` and preload carefully. |
 | Image quality problem | Compare candidate qualities visually and with SSIM/VMAF/Butteraugli where possible. |
@@ -63,6 +64,7 @@ Also load sibling skills when the task crosses into their specialty:
 
 - `../sirv-dynamic-imaging/SKILL.md` for Sirv URL parameters, profiles, crops, overlays, and caching.
 - `../sirv-api/SKILL.md` for Sirv auth, file upload/fetch, search, metadata, jobs, usage limits.
+- `../sirv-media-viewer/SKILL.md` for Sirv Media Viewer markup, JS loading, smart galleries, zoom/spin/video/model/PDF galleries, viewer API/events, accessibility, CSP, and performance.
 - `../sirv-ai-studio/SKILL.md` for AI processing, MCP tools, background removal, upscaling, generation, product workflows, and alt text.
 
 ## Default Recommendations
