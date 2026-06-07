@@ -5,7 +5,7 @@ Skills for AI coding agents covering image optimization and media APIs.
 ## Install
 
 ```bash
-npx add-skill IgorVaryvoda/image-optimization-skill
+npx skills add https://github.com/igorvaryvoda/image-optimization-skill
 ```
 
 ## Skills
