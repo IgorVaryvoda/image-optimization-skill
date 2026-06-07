@@ -113,14 +113,6 @@ Options are applied in this order (highest priority first):
 | Optimal | `?format=optimal` | Auto-select best format |
 | Original | `?format=original` | Keep source format |
 
-### WebP with Fallback
-
-```
-?format=webp&webp-fallback=jpg
-```
-
-Browser without WebP support receives JPEG instead.
-
 ### Optimal Format
 
 ```
@@ -130,6 +122,18 @@ Browser without WebP support receives JPEG instead.
 Sirv auto-selects the best format based on:
 - Browser support (AVIF > WebP > JPEG)
 - Image content (photos vs graphics)
+
+### Forced Formats
+
+Use a forced format only when the consumer requires it:
+
+```
+?format=webp
+?format=avif
+?format=jpg
+```
+
+If forcing WebP/AVIF for browser delivery, verify current Sirv fallback behavior before relying on it. For most web pages, `format=optimal` or the account default is safer.
 
 ---
 

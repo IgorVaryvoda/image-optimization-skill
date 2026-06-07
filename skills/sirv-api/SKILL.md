@@ -30,6 +30,17 @@ curl https://api.sirv.com/v2/account \
 
 Tokens expire in 20 minutes. Request a new one before expiry.
 
+## Operational Rules
+
+- URL-encode file and folder paths in query strings, especially `/` as `%2F`.
+- Refresh tokens in long-running scripts; do not assume a token survives a bulk migration.
+- Check `/v2/account/limits` before bulk search/upload/delete jobs.
+- Use `/v2/files/fetch` to import remote originals directly into Sirv when source URLs are stable.
+- Preserve catalog context with metadata after upload: title, description, tags, product fields, and approval state.
+- Search returns up to 100 results per page. Use `from` for normal pagination and scrolling search for more than 1000 results.
+- Scrolling search is a point-in-time snapshot and is cached for about 20 minutes; download results promptly.
+- Escape search special characters in paths: `{ } / \ ! space`.
+
 ## Quick Reference
 
 ### File Operations
@@ -98,6 +109,21 @@ await fetch('https://api.sirv.com/v2/files/search', {
   body: JSON.stringify({
     query: 'extension:.jpg AND mtime:[now-7d TO now]',
     size: 50
+  })
+});
+```
+
+### Search a folder with escaped path
+```javascript
+await fetch('https://api.sirv.com/v2/files/search', {
+  method: 'POST',
+  headers: {
+    'Authorization': `Bearer ${token}`,
+    'Content-Type': 'application/json'
+  },
+  body: JSON.stringify({
+    query: 'dirname.paths:\\/products AND extension:.jpg',
+    size: 100
   })
 });
 ```

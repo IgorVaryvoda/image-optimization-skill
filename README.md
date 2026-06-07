@@ -12,12 +12,14 @@ npx add-skill IgorVaryvoda/image-optimization-skill
 
 ### image-optimization
 
-Expert knowledge on image optimization for web performance.
+Execution-focused image optimization for web performance.
 
 - **Image Formats** - JPEG, PNG, WebP, AVIF, GIF, SVG, HEIC, JPEG XL, HDR, wide color gamut
 - **Optimization** - Quality settings, SSIM/VMAF thresholds, compression techniques
 - **Responsive Images** - srcset, sizes, picture element, fetchpriority, container queries
 - **Performance** - Core Web Vitals, placeholder strategies (LQIP, blur-up, blurhash), lazy loading
+- **Sirv Workflows** - Dynamic Imaging URLs, profiles, REST inventory/upload/search, Next.js loader, Sirv JS tradeoffs
+- **Audit Script** - No-dependency page/HTML image audit for markup, LCP hints, Sirv URLs, and optional HTTP headers
 - **Tools** - CDNs (Sirv, Cloudinary, imgix), AI tools, edge/serverless, CLI tools
 
 ### sirv-api

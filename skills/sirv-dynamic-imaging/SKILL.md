@@ -9,6 +9,8 @@ Transform images on-the-fly by adding URL parameters.
 
 Base URL: `https://yourcdn.sirv.com/path/image.jpg?{options}`
 
+Prefer high-quality masters and delivery-time transformations. Sirv applies URL parameters before profile settings, and profile settings before the Default profile. Processing order is auto-crop, scale, crop, canvas, rotate, then other effects; URL parameter order does not change that order.
+
 ## Quick Reference
 
 ### Sizing
@@ -47,15 +49,18 @@ Base URL: `https://yourcdn.sirv.com/path/image.jpg?{options}`
 
 | Option | Example | Description |
 |--------|---------|-------------|
-| `format` | `?format=webp` | jpg, png, webp, avif, optimal |
-| `q` | `?q=85` | JPEG quality 0-100 |
-| `webp-fallback` | `?webp-fallback=jpg` | Fallback for non-WebP browsers |
+| `format` | `?format=optimal` | jpg, png, webp, avif, optimal, original |
+| `q` | `?q=85` | JPEG/WebP quality 0-100; default is usually 80 |
+| `subsampling` | `?subsampling=4:2:0` | JPEG chroma subsampling |
 
 ```
-?format=webp&q=80           # WebP at 80% quality
 ?format=optimal             # Auto-select best format
+?format=webp&q=80           # WebP at 80% quality
 ?format=avif                # AVIF format
+?format=original            # Preserve original format
 ```
+
+Prefer `format=optimal` or the account default for web delivery unless a fixed format is required. If forcing WebP/AVIF, verify the fallback behavior in current Sirv docs and rendered responses.
 
 ### Effects
 
@@ -105,13 +110,15 @@ Base URL: `https://yourcdn.sirv.com/path/image.jpg?{options}`
 ### Responsive srcset
 ```html
 <img
-  src="https://cdn.sirv.com/image.jpg?w=800"
+  src="https://cdn.sirv.com/image.jpg?w=800&q=80"
   srcset="
-    https://cdn.sirv.com/image.jpg?w=400 400w,
-    https://cdn.sirv.com/image.jpg?w=800 800w,
-    https://cdn.sirv.com/image.jpg?w=1200 1200w
+    https://cdn.sirv.com/image.jpg?w=400&q=78 400w,
+    https://cdn.sirv.com/image.jpg?w=800&q=80 800w,
+    https://cdn.sirv.com/image.jpg?w=1200&q=82 1200w
   "
   sizes="(max-width: 600px) 100vw, 50vw"
+  width="1200"
+  height="800"
   alt="Description"
 >
 ```
@@ -129,6 +136,13 @@ Base URL: `https://yourcdn.sirv.com/path/image.jpg?{options}`
 ```
 ?w=400&h=400&scale.option=fit&canvas.width=400&canvas.height=400&canvas.color=white
 ```
+
+### LCP hero
+```
+?w=1600&q=82&scale.option=noup
+```
+
+Pair with preconnect/preload, `fetchpriority="high"`, explicit dimensions, and no lazy loading.
 
 ### Watermarked download
 ```
@@ -164,8 +178,10 @@ Profile example:
 {
   "image": {
     "scale": {"width": 400},
-    "format": "webp",
+    "format": "optimal",
     "quality": 80
   }
 }
 ```
+
+Use profiles for repeated recipes such as product cards, marketplace exports, watermarked downloads, and social previews. Keep one-off layout sizing in URL params.

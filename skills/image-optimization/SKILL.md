@@ -1,87 +1,98 @@
 ---
 name: image-optimization
-description: Expert guidance on image optimization for web performance. Use when working with image formats (WebP, AVIF, JPEG, PNG, GIF, SVG, HEIC, JPEG XL), compression settings, responsive images, lazy loading, CDNs, Core Web Vitals, or any image-related web development task. Covers format selection, quality settings, srcset/sizes, picture element, art direction, fetchpriority, placeholder strategies (LQIP, blur-up, blurhash), container queries, HDR/wide color gamut, AI-powered image tools, edge/serverless processing, and performance optimization.
+description: Expert guidance on image optimization for web performance. Use when auditing or improving image delivery, Core Web Vitals, LCP/CLS/INP, responsive images, srcset/sizes, lazy loading, preloading, CDN delivery, Sirv/Cloudinary/imgix/Vercel/Cloudflare image pipelines, format conversion, compression, alt text, product media, or image-heavy frontend code. Covers AVIF, WebP, JPEG, PNG, GIF, SVG, HEIC, JPEG XL, HDR/wide gamut, quality settings, placeholders, image audits, Sirv dynamic imaging/API workflows, and implementation verification.
 ---
 
 # Image Optimization Expert
 
-## Quick Reference
+## Default Workflow
 
-### Format Selection
+1. Inspect the real surface before prescribing changes: rendered HTML, framework image components, network waterfall, build output, CDN URLs, and asset inventory.
+2. Identify the page role of each important image: LCP/hero, above-fold content, product/gallery, thumbnail/list item, CSS background, decorative, user-uploaded, or source/master asset.
+3. Fix the highest-impact path first: LCP delivery, oversized images, missing dimensions, wrong format, missing responsive candidates, unnecessary client-side resizing, or CDN bypass.
+4. Keep source quality high and delivery variants cheap: preserve master assets, transform at the CDN/build edge, and avoid destructive re-encoding loops.
+5. Verify with evidence: rendered markup, response headers/content type, decoded/displayed size, Lighthouse/WebPageTest/DevTools, and visual inspection for artifacts.
 
-| Use Case | Best Format | Fallback |
-|----------|-------------|----------|
-| Photos | AVIF | WebP → JPEG |
-| Graphics/logos with transparency | SVG | WebP → PNG |
-| Photos with transparency | WebP | PNG |
-| Animations | WebP | GIF (or MP4 for long animations) |
-| Icons | SVG | WebP → PNG |
-| Screenshots | WebP | PNG |
+When a repo/app is available, make the patch instead of only giving advice. Prefer local framework conventions over generic snippets.
 
-### Quality Settings by Format
+## Fast Audit Checklist
 
-| Format | Recommended Quality | Notes |
-|--------|---------------------|-------|
-| JPEG | 75-85 | 80 is sweet spot for photos |
-| WebP | 75-85 | More efficient than JPEG at same quality |
-| AVIF | 60-75 | Much more efficient, use lower numbers |
-| PNG | N/A | Lossless, optimize with tools like oxipng |
+- **LCP:** Hero image is not lazy loaded, has `fetchpriority="high"` or framework priority, is preloaded when appropriate, comes from a fast origin/CDN, and is right-sized for the rendered slot.
+- **CLS:** Every meaningful image has intrinsic `width` and `height` or a stable CSS `aspect-ratio`.
+- **Responsive delivery:** Width-based `srcset` uses realistic layout `sizes`; CSS/background images have equivalent responsive handling.
+- **Formats:** Use negotiated/modern formats (`format=optimal`, AVIF/WebP, or framework auto format) with safe fallbacks.
+- **Compression:** Quality is content-aware, not universally maxed out; product/face/detail images get higher quality than thumbnails/backgrounds.
+- **Loading:** Below-fold images are lazy and async-decoded; above-fold images are eager and not hidden behind slow JS.
+- **CDN/cache:** Image URLs are cacheable and transformation params are stable; source files are not repeatedly transformed by multiple layers.
+- **Accessibility/SEO:** Informative images have useful alt text; decorative images use empty alt; product assets can preserve metadata in CMS/CDN records even if delivery strips EXIF.
 
-### Responsive Image Breakpoints
+## Use The Audit Script
 
-Standard widths: 320, 480, 768, 1024, 1366, 1600, 1920, 2560
+For HTML files or public URLs, run the bundled no-dependency audit before and after changes:
 
-```html
-<img
-  src="image-800.jpg"
-  srcset="
-    image-320.jpg 320w,
-    image-480.jpg 480w,
-    image-768.jpg 768w,
-    image-1024.jpg 1024w,
-    image-1600.jpg 1600w
-  "
-  sizes="(max-width: 768px) 100vw, 50vw"
-  alt="Description"
-  loading="lazy"
-  decoding="async"
->
+```bash
+node skills/image-optimization/scripts/audit-images.mjs ./dist/index.html
+node skills/image-optimization/scripts/audit-images.mjs --head https://example.com/
+node skills/image-optimization/scripts/audit-images.mjs --json https://example.com/ > image-audit.json
 ```
 
-### Modern Format with Fallbacks
+The script checks image markup, `srcset`/`sizes`, preload hints, likely LCP mistakes, Sirv URL usage, and optional HTTP headers/content length.
 
-```html
-<picture>
-  <source srcset="image.avif" type="image/avif">
-  <source srcset="image.webp" type="image/webp">
-  <img src="image.jpg" alt="Description" loading="lazy">
-</picture>
-```
+## Decision Matrix
 
-## When to Read Reference Files
+| Situation | Preferred Action |
+| --- | --- |
+| Static/project-owned images | Generate responsive variants at build time or move masters to an image CDN. |
+| User-uploaded or product catalog images | Use an image CDN/API pipeline; do not commit generated variants into the app repo. |
+| Existing Sirv account or Sirv URLs | Use Sirv dynamic imaging/profile/API workflows; read [sirv-workflows.md](references/sirv-workflows.md). |
+| Next.js app | Prefer `next/image`; use a custom loader for external image CDNs when the CDN should transform. |
+| CSS background hero | Consider replacing with semantic `<img>`/`picture`; if it must remain CSS, use `image-set()` and preload carefully. |
+| Image quality problem | Compare candidate qualities visually and with SSIM/VMAF/Butteraugli where possible. |
+| Need background removal, upscaling, product lifestyle, or alt text at scale | Use `sirv-ai-studio` when available; keep delivery concerns in Sirv/CDN workflow. |
 
-- **Format details** (compression algorithms, browser support, encoding options, HDR, wide color gamut): See [formats.md](references/formats.md)
-- **Compression techniques** (lossy vs lossless, quality optimization, SSIM/VMAF thresholds, batch processing): See [optimization.md](references/optimization.md)
-- **Responsive images** (srcset, sizes, art direction, fetchpriority, container queries): See [responsive.md](references/responsive.md)
-- **Performance** (lazy loading, Core Web Vitals, placeholder strategies, preloading, CDNs): See [performance.md](references/performance.md)
-- **Tools and services** (Sirv, Cloudinary, imgix, AI tools, edge/serverless, CLI tools): See [tools.md](references/tools.md)
+## When To Read References
 
-## Core Principles
+- **Sirv implementation workflows:** CDN migration, dynamic URLs, profiles, REST inventory/upload/search, Next.js loader, verification: [sirv-workflows.md](references/sirv-workflows.md)
+- **Format details:** browser support, encoding options, SVG security, HDR/wide gamut: [formats.md](references/formats.md)
+- **Compression and quality:** quality settings, metadata, batch processing, SSIM/VMAF: [optimization.md](references/optimization.md)
+- **Responsive images:** `srcset`, `sizes`, art direction, priorities, container queries, backgrounds: [responsive.md](references/responsive.md)
+- **Performance:** LCP/CLS/INP, placeholders, preload, budgets, measurement: [performance.md](references/performance.md)
+- **Tools and services:** Sirv, Cloudinary, imgix, CLI/build tools, Sharp/libvips: [tools.md](references/tools.md)
 
-1. **Serve modern formats** - AVIF/WebP with JPEG/PNG fallbacks
-2. **Right-size images** - Never serve larger than display size
-3. **Lazy load below-fold** - Use `loading="lazy"` for offscreen images
-4. **Optimize LCP images** - Preload hero images, avoid lazy loading
-5. **Use CDN** - Edge caching and automatic optimization
-6. **Set dimensions** - Always include width/height to prevent layout shift
+Also load sibling skills when the task crosses into their specialty:
 
-## Common Mistakes
+- `../sirv-dynamic-imaging/SKILL.md` for Sirv URL parameters, profiles, crops, overlays, and caching.
+- `../sirv-api/SKILL.md` for Sirv auth, file upload/fetch, search, metadata, jobs, usage limits.
+- `../sirv-ai-studio/SKILL.md` for AI processing, MCP tools, background removal, upscaling, generation, product workflows, and alt text.
 
-- Lazy loading LCP (hero) images - hurts performance
-- Missing width/height attributes - causes layout shift (CLS)
-- Serving 4K images to mobile devices
-- Using PNG for photos (use JPEG/WebP/AVIF)
-- Using JPEG for graphics with text/transparency
-- Not providing fallbacks for AVIF/WebP
-- Over-compressing and creating visible artifacts
-- Ignoring aspect ratio in responsive images
+## Default Recommendations
+
+| Use Case | Format/Delivery Default |
+| --- | --- |
+| Photos and product images | AVIF/WebP via auto negotiation; JPEG fallback when needed. |
+| Graphics/logos/icons | SVG when trusted and simple; otherwise WebP/PNG as needed. |
+| Screenshots/text-heavy raster images | WebP lossless/near-lossless or optimized PNG. |
+| Short animations | Animated WebP or video; avoid large GIFs. |
+| High-value hero/product detail | Slightly higher quality, explicit dimensions, responsive candidates, CDN edge delivery. |
+| Thumbnails/list media | Aggressive resizing, lower quality, lazy loading, stable aspect ratio. |
+
+Quality starting points:
+
+| Format | Starting Quality |
+| --- | --- |
+| JPEG | 75-85, higher for product/detail |
+| WebP | 75-85 lossy; lossless for sharp graphics |
+| AVIF | 60-75 for most photos |
+| PNG | Lossless, then optimize or convert when safe |
+
+## Common Mistakes To Catch
+
+- Lazy-loading the LCP image.
+- Missing dimensions/aspect ratio.
+- Serving a 2-4K image into a small card or mobile slot.
+- Writing `sizes="100vw"` for images that render in a 33-50vw grid.
+- Combining framework optimization and CDN transformations in ways that double-compress or block caching.
+- Hard-coding AVIF/WebP without a fallback or content negotiation path.
+- Using PNG for photos or JPEG for transparency/sharp text.
+- Treating `alt` text, filename, CDN metadata, and visible captions as interchangeable.
+- Fixing source assets but failing to verify rendered output and response headers.

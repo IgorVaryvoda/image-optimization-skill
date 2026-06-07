@@ -133,26 +133,29 @@ Base URL: `https://your-account.sirv.com/`
 /image.jpg?w=800          # Width
 /image.jpg?h=600          # Height
 /image.jpg?w=800&h=600    # Both (may crop)
-/image.jpg?scale.width=800&scale.height=600&scale.option=fit  # Fit within
+/image.jpg?w=800&h=600&scale.option=fit  # Fit within
+/image.jpg?s=1200         # Longest dimension
+/image.jpg?thumbnail=300  # Square thumbnail
 ```
 
 **Format conversion:**
 ```
-/image.jpg?format=webp    # Convert to WebP
-/image.jpg?format=avif    # Convert to AVIF
 /image.jpg?format=optimal # Auto-select best format
+/image.jpg?format=webp    # Force WebP when required
+/image.jpg?format=avif    # Force AVIF when required
+/image.jpg?format=original # Preserve original format
 ```
 
 **Quality:**
 ```
 /image.jpg?q=80           # Quality 0-100
-/image.jpg?q=auto         # Automatic quality
+/image.jpg?q=0            # Preserve original JPEG quality
 ```
 
 **Cropping:**
 ```
 /image.jpg?crop.type=face        # Face detection crop
-/image.jpg?crop.type=focalpoint  # Smart crop
+/image.jpg?crop.type=poi         # Point-of-interest crop
 /image.jpg?cx=50&cy=50&cw=200&ch=200  # Manual crop
 ```
 
