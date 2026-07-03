@@ -96,7 +96,7 @@ Prefer `format=optimal` or the account default for web delivery unless a fixed f
 ```
 ?text=Hello%20World
 ?text=Hello&text.size=30%&text.color=white&text.position=southeast
-?text=©2024&text.font.family=Open%20Sans&text.opacity=50
+?text=©%20Acme&text.font.family=Open%20Sans&text.opacity=50
 ```
 
 ### Watermark
@@ -164,15 +164,6 @@ Pair with preconnect/preload, `fetchpriority="high"`, explicit dimensions, and n
 - **Effects & filters** (color, blur, sharpen, colortone presets): See [effects.md](references/effects.md)
 - **Text & watermarks** (fonts, positioning, styling): See [overlays.md](references/overlays.md)
 - **Profiles & optimization** (reusable presets, caching, formats): See [profiles.md](references/profiles.md)
-
-## Processing Order
-
-1. Auto-crop
-2. Scale
-3. Crop
-4. Canvas
-5. Rotate
-6. Other effects
 
 ## Profiles
 

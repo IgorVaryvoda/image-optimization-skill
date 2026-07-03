@@ -1,6 +1,6 @@
 ---
 name: image-optimization
-description: Expert guidance on image optimization for web performance. Use when auditing or improving image delivery, Core Web Vitals, LCP/CLS/INP, responsive images, srcset/sizes, lazy loading, preloading, CDN delivery, Sirv/Cloudinary/imgix/Vercel/Cloudflare image pipelines, format conversion, compression, alt text, product media, Sirv Media Viewer galleries/zoom/spins/videos, or image-heavy frontend code. Covers AVIF, WebP, JPEG, PNG, GIF, SVG, HEIC, JPEG XL, HDR/wide gamut, quality settings, placeholders, image audits, Sirv dynamic imaging/API/viewer workflows, and implementation verification.
+description: Expert guidance on image optimization for web performance. Use when auditing or improving image delivery, Core Web Vitals, LCP/CLS/INP, responsive images, srcset/sizes, lazy loading, preloading, CDN delivery, Sirv/Cloudinary/imgix/Vercel/Cloudflare image pipelines, format conversion, compression, alt text, product media, Sirv dynamic imaging/API/Media Viewer workflows (galleries, zoom, spins, videos), or image-heavy frontend code. Covers AVIF, WebP, JPEG, PNG, GIF, SVG, HEIC, JPEG XL, HDR/wide gamut, quality settings, placeholders, image audits, and implementation verification.
 ---
 
 # Image Optimization Expert
@@ -28,12 +28,12 @@ When a repo/app is available, make the patch instead of only giving advice. Pref
 
 ## Use The Audit Script
 
-For HTML files or public URLs, run the bundled no-dependency audit before and after changes:
+For HTML files or public URLs, run the bundled no-dependency audit before and after changes. The script lives in this skill's own `scripts/` directory — resolve it from the skill's base directory (shown when this skill loads), not the target project:
 
 ```bash
-node skills/image-optimization/scripts/audit-images.mjs ./dist/index.html
-node skills/image-optimization/scripts/audit-images.mjs --head https://example.com/
-node skills/image-optimization/scripts/audit-images.mjs --json https://example.com/ > image-audit.json
+node <skill-base-dir>/scripts/audit-images.mjs ./dist/index.html
+node <skill-base-dir>/scripts/audit-images.mjs --head https://example.com/
+node <skill-base-dir>/scripts/audit-images.mjs --json https://example.com/ > image-audit.json
 ```
 
 The script checks image markup, `srcset`/`sizes`, preload hints, likely LCP mistakes, Sirv URL usage, and optional HTTP headers/content length.

@@ -48,6 +48,7 @@ Guide for using Sirv AI Studio (www.sirv.studio), an AI-powered image and video 
 - **Batch Processing** - Process hundreds of images at once
 - **Workflow Builder** - Visual DAG pipeline for multi-step operations
 - **MCP Server** - Natural language image processing via Claude/ChatGPT
+- **REST API** - Endpoints for scripts and app integrations
 
 ### sirv-media-viewer
 
