@@ -53,6 +53,8 @@ Execution facts: runs take 30 seconds to several minutes; every step spends cred
 
 Prefer a saved workflow over hand-chaining single tools when the user will repeat the process - it keeps settings consistent across batches.
 
+Store-facing step types worth knowing when reading a workflow: `pushToShopify`, `channelReadinessGate` (marketplace channel readiness), the DAM/PIM steps (`saveToDam`, `linkToProduct`, `writeProductAttributes`, `addToCollection`), and e-commerce AI steps that exist only as workflow steps, not standalone tools: smart crop, add shadow, color variants, ghost mannequin, image review. Workflow Triggers can run pipelines automatically on events (configured in the web app).
+
 ## Supplier Portal (Supplier Portal Pro tier)
 
 For teams receiving product images from suppliers/vendors:

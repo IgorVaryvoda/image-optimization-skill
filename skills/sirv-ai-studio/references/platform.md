@@ -1,135 +1,85 @@
 # Sirv AI Studio Platform Guide
 
-Web UI features, full tool catalog, batch processing, Workflow Builder, pricing, and integrations. Use this when advising on the web UI, comparing tools/models, or planning multi-step and batch workflows.
+Web app features, current tool catalog, batch processing, Workflow Builder, platform areas, pricing, and integrations. Use this when advising on the web UI, comparing tools/models, or planning multi-step and batch workflows.
 
-Plan pricing and credit costs verified against the service source (July 2026); they change as models and plans evolve — confirm at sirv.studio (or with `sirv_get_usage`) before committing to large jobs.
+Verified against the product source (July 2026). The catalog evolves quickly — when precision matters, confirm in the app or at sirv.studio.
 
 ## Table of Contents
 
 1. [Web UI Basics](#web-ui-basics)
-2. [Core Tools](#core-tools)
+2. [Tool Catalog](#tool-catalog)
 3. [Batch Processing](#batch-processing)
 4. [Workflow Builder (Orchestrator)](#workflow-builder-orchestrator)
-5. [Credit System](#credit-system)
-6. [Sirv CDN Integration](#sirv-cdn-integration)
-7. [Integrations](#integrations)
-8. [Quality Control](#quality-control)
+5. [Platform Areas](#platform-areas)
+6. [Credit System](#credit-system)
+7. [Sirv CDN Integration](#sirv-cdn-integration)
+8. [Integrations](#integrations)
 9. [File Formats](#file-formats)
 10. [Tips](#tips)
 
 ## Web UI Basics
 
-Users access Sirv AI Studio at www.sirv.studio:
+Users access Sirv AI Studio at www.sirv.studio. Create opens as an operations dashboard; tools live in a composer picker and the workspace sidebar, organized in six categories (below). Typical flow: upload via drag-drop or URL → pick tool → configure → process → download or auto-upload to Sirv/Assets.
 
-1. Upload image(s) via drag-drop or URL
-2. Select tool from sidebar
-3. Configure options
-4. Click Process
-5. Download or auto-upload to Sirv CDN
+## Tool Catalog
 
-## Core Tools
+Current categories and tools (display names as shown in the app):
 
-### Background Processing
+### Edit
+| Tool | Notes / Credits |
+|------|---------|
+| Remove background | BiRefNet 1, Bria 2; batch variant available |
+| Change background | FLUX Kontext 3, Bria 4, Nano Banana 15, Solid Background 1+; batch variant |
+| Expand image (uncrop) | Bria Expand, 2; batch variant |
+| Fix Lighting (Relight) | Nano Banana 2 Edit-backed, ~5 |
+| Remove object / Generative Fill | Object removal 3 (Qwen); fill mode uses Bria GenFill 4 |
+| Translate text in images | Gemini default; batch variant |
+| Background sheets | Spreadsheet/URL-driven bulk background work |
 
-| Tool | Credits | Use Case |
-|------|---------|----------|
-| Background Removal | 1 (BiRefNet), 2 (Bria) | Product cutouts, transparent PNG |
-| Background Replace | 3 (FLUX Kontext), 4 (Bria), 15 (Nano Banana) | New backgrounds via prompt or image |
-| Object Removal | 3 | Remove unwanted elements with mask |
+### Product
+| Tool | Notes / Credits |
+|------|---------|
+| Product lifestyle | Bria 4 default, Nano Banana Lite 2; batch variant |
+| Combine photos (Bundle Composer) | GPT Image 2 Edit-backed |
+| Marketplace optimizer | Compliance scorecard + one-click fixes (Amazon, eBay, Shopify, Walmart) |
+| AI Fashion Model | Virtual try-on: default 4; Fashn 8, Gemini 10, GPT 13, FLUX 2 |
+| Fashion video | Try-on video, 11/second (Kling) |
 
-**Background Removal Models:**
-- BiRefNet v1/v2: Fast, multiple presets (Light, Heavy, Portrait, Matting)
-- Bria: Premium quality alternative
+### Enhance
+| Tool | Notes / Credits |
+|------|---------|
+| Upscale image | ESRGAN 1-2, Clarity ~3/output-MP, Topaz 8-136 by output size; batch + sheets variants |
+| Upscale video | Topaz Video (per-second, min 5) or SeedVR (per output data); NEW |
+| Image optimizer | Social presets, resize/crop/convert |
+| GLB optimizer | 3D model optimization, 2; batch variant |
 
-### Image Enhancement
+### Create
+| Tool | Notes / Credits |
+|------|---------|
+| Generate image | Nano Banana 2 default 5-15 by res; FLUX 2 1, Z-Image 2, Seedream 2, Gemini Pro 15-30, GPT Image 2 13; batch variant |
+| Transform image (image-to-image) | Nano Banana 2 Edit 5 default; Reve 1, Z-Image 1, FLUX 2 Edit 3, Seedream Edit 4 |
+| Video generation | Veo 3.1 10-15/s, LTX 6-24/s, Kling 7-14/s, Kling 3.0/Pro 8.4-16.8/s, Seedance 2 Fast ~24/s |
+| Image to 3D | Meshy 50, Multi-view 25, Seed3D 50, Trellis 2, Trellis 2 (v2) 30, Hunyuan3D 25 |
+| SVG generation | QuiverAI generation 15; Recraft vectorize mode 1 |
 
-| Tool | Credits | Use Case |
-|------|---------|----------|
-| Upscaling | 1-136 by model and output size | Increase resolution |
-| FLUX 2 Edit | 3 | Natural language editing |
-| Reve Fast Edit | 1 | Quick prompt-based edits |
+### Analyze
+| Tool | Notes / Credits |
+|------|---------|
+| Alt text | 1; batch variant |
+| Product descriptions | 1 (12+ languages) |
+| Document summary | Document analysis |
+| PDF translation | 3; NEW |
+| Video captions | Multi-language transcription |
+| Depth map | FREE |
 
-**Upscaling Models** (cost scales with output megapixels):
-- ESRGAN: Fast, affordable — 1 credit (2 above 48MP output)
-- Clarity: AI-enhanced with prompts — ~3 credits per output MP, min 2
-- Topaz: Premium quality — 8/16/32/136 by output size tier
-- SeedVR: video-grade upscaler (API)
+### Automation
+Workflows (Orchestrator) — see below.
 
-Scale limits vary by surface: MCP tool 2-4x, REST API up to 10x, clamped to each model's max.
-
-### Image Generation
-
-| Tool | Credits/image | Use Case |
-|------|---------|----------|
-| FLUX 2 | 1 | High-quality text-to-image |
-| Z-Image | 2 | Affordable alternative |
-| Seedream | 2 | Creative/artistic styles |
-| Nano Banana 2 | 5 (1K) / 10 (2K) / 15 (4K) | Versatile generation |
-| Gemini Pro | 15 (1K) / 30 (4K) | Advanced generation |
-| GPT Image 2 | 13 | Photorealistic generation |
-
-Supports: 1-4 images per generation (cost multiplies), multiple aspect ratios, up to 2048x2048
-
-### Product Tools
-
-| Tool | Credits | Use Case |
-|------|---------|----------|
-| Product Lifestyle | 4 (Bria), 2 (Nano Banana Lite) | Product in lifestyle scenes |
-| Virtual Try-On | 2-13 by model (default 4) | Garment on person |
-| Try-On Video | 11/second | Animated try-on |
-| Color Variants | 2+/color | Product in multiple colors |
-| Alt Text | 1 | AI-generated descriptions |
-| Product Description | 1 | Marketing copy (12+ languages) |
-
-**Lifestyle Scenes:** 44 presets (kitchen, office, beach, etc.) or custom prompts
-
-### 3D Generation
-
-| Tool | Credits | Use Case |
-|------|---------|----------|
-| Meshy v6 | 50 | Single image to 3D |
-| Meshy v5 Multi | 25 | Multi-angle input |
-| Seed3D | 50 | Alternative model |
-| Trellis / Trellis 2 | 2 / 30 | Budget and mid options |
-| Hunyuan3D | 25 | Alternative model |
-
-**Output formats:** GLB, OBJ, FBX, USDZ, Blend, STL with PBR textures (plus GLB optimization, 2 credits)
-
-### Video Tools
-
-| Tool | Credits/second | Use Case |
-|------|---------|----------|
-| Veo 3.1 | 10 (15 with audio) | High quality generation |
-| LTX 2.0 | 6 (1080p) / 12 (1440p) / 24 (2160p) | Up to 4K, 6-10 seconds |
-| Kling 2.6 | 7 (14 with audio) | 1080p with speech synthesis |
-| Kling v3 / v3 Pro | 8.4-16.8 | Newer Kling variants |
-| Captions | Variable | Multi-language transcription |
-
-Total video cost = per-second rate × duration.
-
-### Free Tools
-
-- **Depth Map**: Generate depth data for 3D/AR effects
-- **Image Optimizer**: 17 social media presets, resize/crop/convert
-- **Smart Crop**: Intelligent cropping for platforms
+Note: Smart Crop, Add Shadow, Color Variants, Ghost Mannequin, and Image Review exist as **Workflow steps**, not standalone tools in the picker. If a user asks for them, route through a workflow.
 
 ## Batch Processing
 
-Process multiple images simultaneously:
-
-1. Upload batch via drag-drop or URL import
-2. Configure shared settings
-3. Preview results before processing
-4. Download ZIP or auto-upload to Sirv
-
-**Available batch tools:**
-- Batch Background Removal
-- Batch Upscale
-- Batch Generate
-- Batch Product Lifestyle
-- Batch Background Replace
-- Batch Alt Text
-- Batch Image Translation
+Standard batch operations (upload set → shared settings → preview → process → ZIP or auto-upload): background removal, upscale, alt text, virtual try-on, depth map, product lifestyle, background replace, image expand, image translation, GLB optimize, and image generation. Spreadsheet/URL-driven "sheets" surfaces exist for background work and upscaling.
 
 **Batch size limits by plan:**
 - Free: 25 in-app; API batch endpoints require a paid plan
@@ -140,20 +90,27 @@ Process multiple images simultaneously:
 
 ## Workflow Builder (Orchestrator)
 
-Visual DAG pipeline builder for multi-step operations:
+Visual DAG pipeline builder. Step types span three groups:
 
-**Capabilities:**
-- Chain tools: Remove BG → Upscale → Lifestyle → Alt Text
-- AI routing: Classify images → branch to different pipelines
-- Quality loops: Review → Autofix → Final Review
-- Multi-source: Combine images from different inputs
+- **AI steps:** generate, upscale, remove/change background, image expand, relight, image-to-image, image translation, product lifestyle, depth map, alt text, product description, smart crop, add shadow, color variants, ghost mannequin, AI fashion model (+video), image to 3D, video generation, video upscale, bundle composer
+- **Sirv/DAM steps:** save to Sirv, add meta tags, set product meta, save to Assets, add to collection, add tags, move to folder, link to product, write product attributes, set favorite
+- **Control steps:** push to Shopify, review / image review (interactive - pause execution), auto fix, AI router (classify + branch), channel readiness gate, save to CSV
 
-**Example workflows:**
-- Amazon-Ready: Remove BG → Validate → Autofix → Alt text
-- Fashion: Ghost mannequin → Remove BG → Shadow → Bundle
-- Color Variants: Remove BG → Generate colors → Review
+**Workflow Triggers** run pipelines automatically on events; workflow limits are plan-enforced.
 
-Saved workflows can also be executed from the MCP server (`sirv_execute_workflow`).
+**Example workflows:** Amazon-Ready (Remove BG → Validate → Autofix → Alt text), Fashion (Ghost mannequin → Remove BG → Shadow → Bundle), Color Variants (Remove BG → Generate colors → Review).
+
+Saved workflows can also be executed from the MCP server (`sirv_execute_workflow` — interactive and CSV steps are skipped there).
+
+## Platform Areas
+
+Beyond one-shot tools, the app has grown into a product-content platform. Know these exist so you route users correctly:
+
+- **Assets (DAM):** the former Library - asset metadata and licensing, saved views, advanced filters, collections. MCP asset tools operate on this.
+- **Products (PIM):** product records with custom attributes, bulk editing, AI Fill for attribute fields, import mapping, and a product readiness command center.
+- **Channels:** publish/readiness management for marketplaces (Amazon, eBay, Google, ...) with channel readiness gates in workflows.
+- **Supplier/Vendor Portal:** B2B media intake - supplier uploads (TIFF-preserving), review queues with reviewer roles, autofix, rejection reasons, submission quotas, SFTP intake. Covered agent-side in `../../sirv-ecommerce/SKILL.md`.
+- **Dashboards:** workspace overview and analytics command centre.
 
 ## Credit System
 
@@ -189,28 +146,17 @@ Connect Sirv account for:
 
 | Platform | Use Case |
 |----------|----------|
-| Shopify | Browse products, auto-push results |
+| Shopify | Embedded admin app; browse products, push results, sync catalog |
 | Zapier | Trigger processing from workflows |
 | n8n | Self-hosted automation |
-| Claude/ChatGPT MCP | Natural language image editing |
+| Claude/ChatGPT MCP | Natural language image processing |
 | REST API | Custom integrations |
-
-## Quality Control
-
-**Image Review Tool:**
-- Checks against marketplace rules (Gemini-backed)
-- Validates: dimensions, background, watermarks, frame fill
-- Presets: Amazon, eBay, Shopify, Walmart
-
-**Marketplace Optimizer:**
-- Upload → Select marketplaces → Get compliance scorecard
-- One-click fixes for all issues
 
 ## File Formats
 
-**Input:** JPG, PNG, WebP, GIF, AVIF, HEIF, BMP, TIFF
+**Input:** JPG, PNG, WebP, GIF, AVIF, HEIF, BMP, TIFF (suppliers can preserve TIFF masters)
 
-**Output:** PNG, JPEG, WebP, GIF (images), MP4/WebM (video), GLB/OBJ/FBX/USDZ/STL (3D)
+**Output:** PNG, JPEG, WebP, GIF (images), MP4/WebM (video), GLB/OBJ/FBX/USDZ/STL (3D), SVG (vectorize)
 
 ## Tips
 

@@ -5,7 +5,7 @@ description: Guide for using Sirv AI Studio (www.sirv.studio), an AI-powered ima
 
 # Sirv AI Studio
 
-Sirv AI Studio processes images and video with AI: background removal and replacement, upscaling, image/video generation, product lifestyle scenes, virtual try-on, alt text, and 3D models. It is reachable three ways, in order of preference for agent work: MCP tools (process directly in conversation), REST API (code integrations), and the web UI at www.sirv.studio (manual workflows, batch UI, Workflow Builder).
+Sirv AI Studio processes images and video with AI: background removal/replacement, upscaling (image and video), image expand, relighting, generative fill, image/video generation, in-image text translation, product lifestyle scenes, virtual try-on (AI Fashion Model), alt text, and 3D models — plus platform areas for assets (DAM), products (PIM), marketplace channels, and supplier intake. It is reachable three ways, in order of preference for agent work: MCP tools (process directly in conversation), REST API (code integrations), and the web UI at www.sirv.studio (manual workflows, batch UI, Workflow Builder).
 
 ## Use MCP Tools When Available
 
@@ -66,7 +66,7 @@ Only direct users to www.sirv.studio if they don't want to set up MCP, or when t
 
 - **MCP tools** — full parameters, models, resolutions, batch limits, prompt-to-tool examples: [references/mcp-tools.md](references/mcp-tools.md)
 - **REST API** — endpoints, auth, request/response shapes, rate limits, JS/cURL examples (for scripts and app integrations): [references/rest-api.md](references/rest-api.md)
-- **Platform guide** — web UI, full tool catalog with credit costs, batch processing, Workflow Builder, pricing tiers, Sirv CDN integration, marketplace quality control: [references/platform.md](references/platform.md)
+- **Platform guide** — web UI, current tool catalog with credit costs, batch processing, Workflow Builder step types and triggers, platform areas (Assets/DAM, Products/PIM, Channels, Supplier Portal), pricing tiers: [references/platform.md](references/platform.md)
 
 For CDN delivery of the processed results (responsive URLs, format/quality, watermarks), hand off to `../sirv-dynamic-imaging/SKILL.md`; for storage, folders, and metadata via API, `../sirv-api/SKILL.md`; for Shopify push/sync, marketplace compliance, supplier autofix, and saved pipelines, `../sirv-ecommerce/SKILL.md`.
 
