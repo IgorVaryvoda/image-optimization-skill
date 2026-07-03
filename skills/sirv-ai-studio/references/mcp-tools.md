@@ -116,13 +116,14 @@ Only these two batch tools exist on the MCP server. They are **synchronous**: th
 
 ## Asset, Product, Workflow & Shopify Tools
 
-The server also exposes management tools beyond image processing. Their schemas are self-describing at runtime:
+The server also exposes management tools beyond image processing:
 
-- **Assets (DAM):** `sirv_list_assets`, `sirv_get_asset`, `sirv_search_assets`, `sirv_find_similar_assets`, `sirv_import_asset_url`, `sirv_update_asset`, `sirv_delete_asset`, `sirv_get_asset_metadata`, `sirv_update_asset_metadata`, `sirv_generate_asset_alt_text` (single asset), `sirv_bulk_asset_operation` (favorite/tag/move/copy/delete — not alt text)
-- **Products (PIM):** `sirv_list_products`, `sirv_get_product`, `sirv_search_products`, `sirv_create_product`, `sirv_update_product`, `sirv_delete_product`, `sirv_link_assets_to_product`, `sirv_list_products_with_assets`, `sirv_bulk_product_action`
+- **Assets (DAM) and Products (PIM):** 20 tools for listing/searching/updating assets (including visual similarity search and persisted alt text) and managing the product catalog with asset linking. Full parameters, semantics, and destructive-operation warnings: [asset-product-tools.md](asset-product-tools.md).
 - **Workflows:** `sirv_list_workflows`, `sirv_get_workflow`, `sirv_execute_workflow` — run saved Workflow Builder pipelines
 - **Shopify:** `sirv_push_image_to_shopify`, `sirv_sync_shopify_products`, `sirv_shopify_status`
 - **Supplier portal:** `sirv_get_supplier_sftp_status`, `sirv_get_supplier_review_assist_requirements`, `sirv_run_supplier_autofix`
+
+Shopify, workflow-execution, and supplier tools are covered agent-side in `../../sirv-ecommerce/SKILL.md`.
 
 ## Usage Examples
 

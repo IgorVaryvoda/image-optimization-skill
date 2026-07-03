@@ -84,7 +84,7 @@ Autofix spends AI credits per iteration. Fetch requirements first, pass the actu
 
 ## Verification
 
-- After push: fetch the product (store admin or `sirv_list_products_with_assets`) and confirm the image, its position, and alt text.
+- After push: fetch the product (store admin or `sirv_list_products_with_assets`) and confirm the image, its position, and alt text. PIM/DAM tool parameters live in `../sirv-ai-studio/references/asset-product-tools.md` — note product deletes are permanent there, unlike soft asset deletes.
 - After sync: report `products.created/updated` and `images.imported/skipped` from the result, not assumptions.
 - After a workflow run: check per-image statuses; surface `partial`/`error` items with their step errors instead of declaring success on the batch.
 - After autofix: re-run the review/requirements check to confirm the image now passes.

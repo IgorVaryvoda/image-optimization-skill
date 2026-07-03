@@ -65,6 +65,7 @@ Only direct users to www.sirv.studio if they don't want to set up MCP, or when t
 ## When to Read References
 
 - **MCP tools** — full parameters, models, resolutions, batch limits, prompt-to-tool examples: [references/mcp-tools.md](references/mcp-tools.md)
+- **Asset (DAM) & Product (PIM) tools** — list/search/similar-search assets, metadata, persisted alt text, product catalog CRUD, asset-to-product linking, bulk operations and their destructive-op warnings: [references/asset-product-tools.md](references/asset-product-tools.md)
 - **REST API** — endpoints, auth, request/response shapes, rate limits, JS/cURL examples (for scripts and app integrations): [references/rest-api.md](references/rest-api.md)
 - **Platform guide** — web UI, current tool catalog with credit costs, batch processing, Workflow Builder step types and triggers, platform areas (Assets/DAM, Products/PIM, Channels, Supplier Portal), pricing tiers: [references/platform.md](references/platform.md)
 
