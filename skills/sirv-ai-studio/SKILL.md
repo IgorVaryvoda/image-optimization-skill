@@ -68,7 +68,7 @@ Only direct users to www.sirv.studio if they don't want to set up MCP, or when t
 - **REST API** — endpoints, auth, request/response shapes, rate limits, JS/cURL examples (for scripts and app integrations): [references/rest-api.md](references/rest-api.md)
 - **Platform guide** — web UI, full tool catalog with credit costs, batch processing, Workflow Builder, pricing tiers, Sirv CDN integration, marketplace quality control: [references/platform.md](references/platform.md)
 
-For CDN delivery of the processed results (responsive URLs, format/quality, watermarks), hand off to `../sirv-dynamic-imaging/SKILL.md`; for storage, folders, and metadata via API, `../sirv-api/SKILL.md`.
+For CDN delivery of the processed results (responsive URLs, format/quality, watermarks), hand off to `../sirv-dynamic-imaging/SKILL.md`; for storage, folders, and metadata via API, `../sirv-api/SKILL.md`; for Shopify push/sync, marketplace compliance, supplier autofix, and saved pipelines, `../sirv-ecommerce/SKILL.md`.
 
 ## Best Practices
 

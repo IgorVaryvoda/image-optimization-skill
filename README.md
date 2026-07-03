@@ -61,6 +61,35 @@ Sirv Media Viewer implementation for product galleries and rich media.
 - **Accessibility** - `data-alt`, Sirv file descriptions, ARIA labels, keyboard/fullscreen checks
 - **Advanced Hooks** - Sirv viewer API, events, analytics hooks, CSP requirements
 
+### video-optimization
+
+Execution-focused video optimization for web performance.
+
+- **Delivery** - Progressive MP4/WebM vs adaptive HLS, codec choice (H.264, VP9, AV1)
+- **Performance** - Posters and LCP, preload strategies, lazy loading, CLS-safe players
+- **Patterns** - Background/hero video, GIF-to-video, YouTube/Vimeo facades, reduced motion
+- **Sirv Video** - Automatic HLS ladder, SMV video options, thumbnails, video-to-spin
+- **Encoding** - ffmpeg recipes for loops, GIF replacement, content video, poster extraction
+
+### sirv-360-spin
+
+Create and embed Sirv 360 spins - interactive rotating product views.
+
+- **Creation** - Frame counts, shooting resolution, file naming for auto-generated .spin files
+- **3D Spins** - Multi-row naming (row/column sequences)
+- **Embedding** - Sirv JS markup, preconnect, gallery integration
+- **Options** - Autospin, zoom, hint, speed, start frame, mobile drag behavior
+- **Conversion** - Video-to-spin and spin-to-video via API
+
+### sirv-ecommerce
+
+Store-facing product imagery workflows with Sirv AI Studio.
+
+- **Shopify** - Connection checks, product sync (inbound), image push with safe upload strategies
+- **Pipelines** - Discover and execute saved Workflow Builder pipelines on image batches
+- **Compliance** - Marketplace presets (Amazon, eBay, Walmart), review and autofix loops
+- **Supplier Portal** - SFTP intake status, review-assist requirements, AI autofix
+
 ### sirv-dynamic-imaging
 
 Sirv dynamic imaging URL API for on-the-fly image transformation.

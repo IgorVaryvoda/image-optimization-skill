@@ -1,0 +1,27 @@
+name: Validate skills
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Validate skill structure, frontmatter, and links
+        run: node scripts/validate-skills.mjs
+
+      - name: Smoke-test image audit script
+        run: |
+          cat > /tmp/test-page.html <<'EOF'
+          <!doctype html><html><head><title>t</title></head><body>
+          <img src="https://demo.sirv.com/hero.jpg" loading="lazy">
+          <img src="pic.png" width="400" height="300" alt="a pic">
+          </body></html>
+          EOF
+          node skills/image-optimization/scripts/audit-images.mjs /tmp/test-page.html | tee /tmp/audit.out
+          grep -q "Image Audit" /tmp/audit.out
+          grep -q "lazy loaded" /tmp/audit.out

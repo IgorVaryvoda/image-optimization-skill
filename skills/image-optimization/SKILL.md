@@ -62,6 +62,7 @@ The script checks image markup, `srcset`/`sizes`, preload hints, likely LCP mist
 
 Also load sibling skills when the task crosses into their specialty:
 
+- `../video-optimization/SKILL.md` for hero/background video, GIF-to-video, streaming, and video embeds.
 - `../sirv-dynamic-imaging/SKILL.md` for Sirv URL parameters, profiles, crops, overlays, and caching.
 - `../sirv-api/SKILL.md` for Sirv auth, file upload/fetch, search, metadata, jobs, usage limits.
 - `../sirv-media-viewer/SKILL.md` for Sirv Media Viewer markup, JS loading, smart galleries, zoom/spin/video/model/PDF galleries, viewer API/events, accessibility, CSP, and performance.

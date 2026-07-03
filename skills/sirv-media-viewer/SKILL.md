@@ -21,6 +21,8 @@ Check current Sirv docs before changing option names, module names, event/API ca
 
 Read [implementation.md](references/implementation.md) when writing or reviewing viewer markup, script loading, options, breakpoints, smart galleries, API/events, or CSP.
 
+For creating the spin assets themselves (frame naming, .spin generation, spin options, video-to-spin), use `../sirv-360-spin/SKILL.md`; for video encoding/streaming strategy outside the viewer, `../video-optimization/SKILL.md`.
+
 ## Default Workflow
 
 1. Identify the media set: zoomable images, static images, `.spin`, video, YouTube/Vimeo, `.glb`/`.gltf`, PDF gallery, or `.view` smart gallery.
