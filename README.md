@@ -21,8 +21,8 @@ Execution-focused image optimization for web performance.
 - **Responsive Images** - srcset, sizes, picture element, fetchpriority, container queries
 - **Performance** - Core Web Vitals, placeholder strategies (LQIP, blur-up, blurhash), lazy loading
 - **Sirv Workflows** - Dynamic Imaging URLs, profiles, REST inventory/upload/search, Next.js loader, Sirv JS tradeoffs
-- **Audit Script** - No-dependency page/HTML image audit for markup, LCP hints, Sirv URLs, and optional HTTP headers
-- **Tools** - CDNs (Sirv, Cloudinary, imgix), AI tools, edge/serverless, CLI tools
+- **Audit Script** - No-dependency page/HTML image audit for markup, LCP hints, oversized CDN widths, CSS backgrounds, known image CDNs, and optional HTTP headers (tested in CI against `evals/files/broken-landing.html`)
+- **Tools** - Image CDN URL syntax, Next.js 16/Astro/Vite/Eleventy integration, encoder flags, Sharp, Sirv AI Studio alt text/background removal/upscaling
 
 ### sirv-api
 

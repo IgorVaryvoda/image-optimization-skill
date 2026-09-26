@@ -5,6 +5,17 @@ import { pathToFileURL } from "node:url";
 
 const IMAGE_EXTENSIONS = /\.(avif|bmp|gif|heic|heif|jpe?g|jxl|png|svg|webp)([?#].*)?$/i;
 const SIRV_HOST_RE = /(^|\.)sirv\.com$/i;
+const IMAGE_CDNS = [
+  ["cloudinary", /res\.cloudinary\.com|\/image\/upload\//i],
+  ["imgix", /\.imgix\.net/i],
+  ["cloudflare", /\/cdn-cgi\/image\/|imagedelivery\.net/i],
+  ["next", /\/_next\/image\?|\/_vercel\/image\?/i],
+  ["netlify", /\/\.netlify\/images\?/i],
+  ["imageengine", /\.imgeng\.in/i],
+  ["bunny", /\.b-cdn\.net/i],
+  ["shopify", /cdn\.shopify\.com/i],
+  ["akamai", /[?&]im=/i]
+];
 
 const args = process.argv.slice(2);
 const flags = {
@@ -47,7 +58,9 @@ Examples:
 }
 
 async function auditTarget(target, options) {
-  const { html, baseUrl, sourceType } = await loadHtml(target);
+  const loaded = await loadHtml(target);
+  const { baseUrl, sourceType } = loaded;
+  const html = stripInertMarkup(loaded.html);
   const images = extractElements(html, "img");
   const sources = extractElements(html, "source");
   const links = extractElements(html, "link");
@@ -70,6 +83,8 @@ async function auditTarget(target, options) {
       index: index + 1,
       src,
       resolvedSrc,
+      cdn: detectCdn(resolvedSrc),
+      requestedWidth: requestedWidth(resolvedSrc),
       srcsetCount: candidates.length,
       alt: attrs.alt,
       width: attrs.width,
@@ -108,8 +123,23 @@ async function auditTarget(target, options) {
     }
   }
 
+  const preloadedUrls = new Set(
+    preloads.flatMap(({ attrs }) => [
+      resolveUrl(attrs.href, baseUrl),
+      ...parseSrcset(attrs.imagesrcset, baseUrl).map((candidate) => candidate.resolved)
+    ])
+  );
+
   for (const cssUrl of cssUrls) {
     if (!IMAGE_EXTENSIONS.test(cssUrl.raw)) continue;
+    if (!preloadedUrls.has(cssUrl.resolved)) {
+      findings.push({
+        severity: "info",
+        target: "css",
+        message: "CSS background image is not visible to the preload scanner; if it is above the fold or the LCP element, preload it or use `<img>`",
+        value: cssUrl.resolved
+      });
+    }
     const sirv = inspectSirvUrl(cssUrl.resolved);
     if (sirv?.hosted && !sirv.hasSizing && !sirv.hasProfile) {
       findings.push({
@@ -171,6 +201,14 @@ async function loadHtml(target) {
     baseUrl: pathToFileURL(absolute).href,
     sourceType: "file"
   };
+}
+
+function stripInertMarkup(html) {
+  return html
+    .replace(/<!--[\s\S]*?-->/g, "")
+    .replace(/<noscript\b[\s\S]*?<\/noscript>/gi, "")
+    .replace(/<template\b[\s\S]*?<\/template>/gi, "")
+    .replace(/(<script\b[^>]*>)[\s\S]*?<\/script>/gi, "$1</script>");
 }
 
 function extractElements(html, tagName) {
@@ -307,22 +345,55 @@ function inferSirvAssetType(src, attrs = {}) {
   return "unknown";
 }
 
+// HTML spec candidate parsing: a URL ends at whitespace, so commas inside URLs
+// (Cloudinary `w_400,q_auto`) are kept; a comma only separates candidates.
 function parseSrcset(srcset, baseUrl) {
-  if (!srcset) return [];
+  const candidates = [];
+  const value = srcset || "";
+  let pos = 0;
 
-  return srcset
-    .split(",")
-    .map((part) => part.trim())
-    .filter(Boolean)
-    .map((part) => {
-      const [url, descriptor] = part.split(/\s+/);
-      const decodedUrl = decodeHtmlEntities(url);
-      return {
-        raw: decodedUrl,
-        resolved: resolveUrl(decodedUrl, baseUrl),
-        descriptor: descriptor || ""
-      };
+  while (pos < value.length) {
+    while (pos < value.length && /[\s,]/.test(value[pos])) pos++;
+    if (pos >= value.length) break;
+
+    let start = pos;
+    while (pos < value.length && !/\s/.test(value[pos])) pos++;
+    let url = value.slice(start, pos);
+    let descriptor = "";
+
+    if (url.endsWith(",")) {
+      url = url.replace(/,+$/, "");
+    } else {
+      start = pos;
+      while (pos < value.length && value[pos] !== ",") pos++;
+      descriptor = value.slice(start, pos).trim();
+    }
+
+    const decodedUrl = decodeHtmlEntities(url);
+    candidates.push({
+      raw: decodedUrl,
+      resolved: resolveUrl(decodedUrl, baseUrl),
+      descriptor
     });
+  }
+
+  return candidates;
+}
+
+function detectCdn(url) {
+  if (!/^https?:\/\//i.test(url || "")) return null;
+  if (SIRV_HOST_RE.test(new URL(url).hostname)) return "sirv";
+  return IMAGE_CDNS.find(([, pattern]) => pattern.test(url))?.[0] || null;
+}
+
+function requestedWidth(url) {
+  if (!url) return null;
+  const match =
+    url.match(/[?&](?:w|width)=(\d+)(?:&|#|$)/i) ||
+    url.match(/[/,]w_(\d+)(?:[,/]|$)/i) ||
+    url.match(/\/cdn-cgi\/image\/(?:[^/]*,)?width=(\d+)/i) ||
+    url.match(/[?&]im=Resize,width=(\d+)/i);
+  return match ? Number(match[1]) : null;
 }
 
 function hasWidthDescriptors(candidates) {
@@ -396,13 +467,24 @@ function inspectImageMarkup(report, attrs, candidates, index, findings) {
     });
   }
 
+  // 2x covers DPR 2 screens; `width` may be intrinsic rather than rendered size, so warn, not error.
+  const slotWidth = Number(report.width);
+  if (!hasWidthDescriptors(candidates) && report.requestedWidth && slotWidth > 0 && report.requestedWidth > slotWidth * 2) {
+    findings.push({
+      severity: "warn",
+      target: label,
+      message: `Image URL requests ${report.requestedWidth}px for a ${slotWidth}px \`width\`; add width candidates or a smaller size`,
+      value: report.resolvedSrc
+    });
+  }
+
   if (report.sirv?.hosted) {
     inspectSirvMarkup(label, report.sirv, findings);
-  } else if (report.resolvedSrc && IMAGE_EXTENSIONS.test(report.resolvedSrc)) {
+  } else if (!report.cdn && report.resolvedSrc && IMAGE_EXTENSIONS.test(report.resolvedSrc)) {
     findings.push({
       severity: "info",
       target: label,
-      message: "Non-Sirv image; consider CDN/build transform if it is not already optimized",
+      message: "Image is not served by a known image CDN; confirm a build step or CDN resizes and converts it",
       value: report.resolvedSrc
     });
   }

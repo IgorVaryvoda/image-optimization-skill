@@ -6,14 +6,13 @@ Use this reference when an image optimization task can be solved with Sirv CDN, 
 
 1. [Choose the Sirv path](#choose-the-sirv-path)
 2. [Dynamic imaging URL strategy](#dynamic-imaging-url-strategy)
-3. [Responsive markup patterns](#responsive-markup-patterns)
+3. [LCP hero pattern](#lcp-hero-pattern)
 4. [Next.js custom loader](#nextjs-custom-loader)
-5. [Sirv JS decision guide](#sirv-js-decision-guide)
+5. [Sirv JS and Media Viewer decision guide](#sirv-js-and-media-viewer-decision-guide)
 6. [REST API migration workflow](#rest-api-migration-workflow)
-7. [Profiles and defaults](#profiles-and-defaults)
-8. [Product media workflow](#product-media-workflow)
-9. [Verification](#verification)
-10. [Pitfalls](#pitfalls)
+7. [Product media workflow](#product-media-workflow)
+8. [Verification](#verification)
+9. [Pitfalls](#pitfalls)
 
 ## Choose The Sirv Path
 
@@ -29,129 +28,38 @@ For performance work in a codebase, start with native HTML/framework markup plus
 
 ## Dynamic Imaging URL Strategy
 
-Sirv creates transformed images by appending query parameters to the master image URL:
+For parameter names, profiles, crops, and processing order, use `../../sirv-dynamic-imaging/SKILL.md`. For optimization work, these defaults apply:
 
-```text
-https://account.sirv.com/products/shoe.jpg?w=800&q=80
-```
+- Size with `w`/`h`/`s` and add `scale.option=noup` so candidates never upscale.
+- Use `format=optimal` (or the account default) for negotiated AVIF/WebP. Do not hard-code `format=avif`.
+- Use `q=75-85` for normal delivery, higher for product detail, lower for thumbnails.
+- Use a `profile=` for any recipe that repeats across many images.
+- Upload high-quality masters (usually 2500-4000px, JPEG 92%+). Let Sirv generate the delivery variants.
+- Images larger than 16MB may be pre-processed; do not delete `/.processed` derivatives that you see through FTP/S3/API.
 
-Prefer:
-
-- `w`, `h`, or `s` for sizing.
-- `scale.option=noup` when a candidate must never upscale.
-- `scale.option=fit` for contained product images.
-- `scale.option=fill` or `crop.type=poi|face` only when cropping is intended.
-- `format=optimal` or the account default for browser-aware format negotiation.
-- `q=75-85` for normal delivery; higher for product detail; lower for placeholders/thumbnails.
-- `profile=name` for repeated recipes used across many images.
-
-Current Sirv docs describe this precedence:
-
-1. URL parameters
-2. Profile settings
-3. Default profile
-
-Processing order is auto-crop, scale, crop, canvas, rotate, then other effects. The order of parameters in the URL does not change the processing order.
-
-Master image guidance:
-
-- Upload high-quality masters, usually 2500-4000px wide.
-- Use 92%+ JPEG quality or uncompressed sources when possible.
-- Let Sirv generate delivery variants rather than committing every derivative.
-- Images larger than 16MB may be pre-processed; do not delete `/.processed` derivatives if you see them through FTP/S3/API.
-
-## Responsive Markup Patterns
-
-### Standard Responsive Image
-
-```html
-<img
-  src="https://account.sirv.com/products/shoe.jpg?w=800&q=80"
-  srcset="
-    https://account.sirv.com/products/shoe.jpg?w=400&q=78 400w,
-    https://account.sirv.com/products/shoe.jpg?w=800&q=80 800w,
-    https://account.sirv.com/products/shoe.jpg?w=1200&q=82 1200w,
-    https://account.sirv.com/products/shoe.jpg?w=1600&q=82 1600w
-  "
-  sizes="(min-width: 1024px) 50vw, 100vw"
-  width="1600"
-  height="1067"
-  alt="Blue suede running shoe side view"
-  loading="lazy"
-  decoding="async"
->
-```
-
-### LCP/Hero Image
+## LCP Hero Pattern
 
 ```html
 <link rel="preconnect" href="https://account.sirv.com" crossorigin>
-<link
-  rel="preload"
-  as="image"
-  href="https://account.sirv.com/heroes/home.jpg?w=1600&q=82"
-  imagesrcset="
-    https://account.sirv.com/heroes/home.jpg?w=800&q=80 800w,
-    https://account.sirv.com/heroes/home.jpg?w=1200&q=82 1200w,
-    https://account.sirv.com/heroes/home.jpg?w=1600&q=82 1600w
-  "
-  imagesizes="100vw"
-  fetchpriority="high"
->
 
 <img
-  src="https://account.sirv.com/heroes/home.jpg?w=1600&q=82"
+  src="https://account.sirv.com/heroes/home.jpg?w=1600&q=82&scale.option=noup"
   srcset="
-    https://account.sirv.com/heroes/home.jpg?w=800&q=80 800w,
-    https://account.sirv.com/heroes/home.jpg?w=1200&q=82 1200w,
-    https://account.sirv.com/heroes/home.jpg?w=1600&q=82 1600w
+    https://account.sirv.com/heroes/home.jpg?w=800&q=80&scale.option=noup 800w,
+    https://account.sirv.com/heroes/home.jpg?w=1200&q=82&scale.option=noup 1200w,
+    https://account.sirv.com/heroes/home.jpg?w=1600&q=82&scale.option=noup 1600w
   "
   sizes="100vw"
   width="1600"
   height="900"
   alt="Kitchen island with the featured espresso machine"
   fetchpriority="high"
-  decoding="sync"
 >
 ```
 
-Do not add `loading="lazy"` to likely LCP images.
+Do not add `loading="lazy"` to the LCP image. Add a `<link rel="preload" imagesrcset imagesizes>` only when the image is not in the initial HTML (for example, a CSS background).
 
-### Product Grid
-
-```html
-<img
-  src="https://account.sirv.com/products/sku-123.jpg?profile=product-card&w=500"
-  srcset="
-    https://account.sirv.com/products/sku-123.jpg?profile=product-card&w=250 250w,
-    https://account.sirv.com/products/sku-123.jpg?profile=product-card&w=500 500w,
-    https://account.sirv.com/products/sku-123.jpg?profile=product-card&w=750 750w
-  "
-  sizes="(min-width: 1200px) 25vw, (min-width: 768px) 33vw, 50vw"
-  width="750"
-  height="750"
-  alt="SKU 123 black leather ankle boot"
-  loading="lazy"
-  decoding="async"
->
-```
-
-### CSS Backgrounds
-
-Prefer semantic images for content. If the image must stay in CSS:
-
-```css
-.hero {
-  background-image: image-set(
-    url("https://account.sirv.com/heroes/home.jpg?w=960&q=80") 1x,
-    url("https://account.sirv.com/heroes/home.jpg?w=1600&q=82") 2x
-  );
-  background-size: cover;
-  background-position: center;
-}
-```
-
-Still reserve layout space and preload true LCP backgrounds if they remain the LCP element.
+For grids, the `sizes` value must match the column width, for example `(min-width: 1200px) 25vw, (min-width: 768px) 33vw, 50vw`. `sizes="100vw"` in a grid downloads images that are 3-4 times too large.
 
 ## Next.js Custom Loader
 
@@ -195,12 +103,14 @@ import Image from "next/image";
   width={1200}
   height={800}
   sizes="(min-width: 1024px) 50vw, 100vw"
-  priority
+  fetchPriority="high"
   alt="Blue suede running shoe side view"
 />;
 ```
 
-For an LCP image, use the framework's priority/preload mechanism. For below-fold images, omit priority and keep realistic `sizes`.
+For an LCP image, use `fetchPriority="high"` or `loading="eager"`. Next.js 16 deprecates the `priority` prop; use `preload` only when exactly one image is the LCP element. For below-fold images, keep the default lazy loading and realistic `sizes`.
+
+The custom loader bypasses the Next.js optimizer, so the `images.qualities` allowlist does not limit the `q` value that Sirv receives.
 
 ## Sirv JS And Media Viewer Decision Guide
 
@@ -219,21 +129,7 @@ Use Sirv JS when:
 
 Avoid Sirv JS for the critical hero path if it delays LCP behind script execution. In component apps, native `srcset`/framework image components with Sirv URLs are often easier to verify and optimize.
 
-For product galleries, use Sirv Media Viewer instead of recreating slider/zoom/spin behavior. Keep delivery transforms in Sirv URLs/profiles, and keep viewer behavior in SMV options:
-
-```html
-<link rel="preconnect" href="https://scripts.sirv.com" crossorigin>
-<link rel="preconnect" href="https://account.sirv.com" crossorigin>
-<script src="https://scripts.sirv.com/sirvjs/v3/sirv.js"></script>
-
-<div class="Sirv" data-options="autostart:created; layout.aspectRatio:1/1; thumbnails.position:bottom">
-  <div data-src="https://account.sirv.com/products/sku-123-front.jpg" data-type="zoom" data-alt="SKU 123 front view"></div>
-  <div data-src="https://account.sirv.com/products/sku-123.spin" data-alt="SKU 123 360 spin"></div>
-  <div data-src="https://account.sirv.com/products/sku-123-demo.mp4" data-alt="SKU 123 demonstration video"></div>
-</div>
-```
-
-Use `autostart:created` only for above-fold/LCP-relevant viewers; keep default lazy behavior for viewers lower on the page. Reserve layout space with CSS, dimensions, or SMV layout/aspect-ratio options to avoid CLS.
+For product galleries, use Sirv Media Viewer instead of recreating slider/zoom/spin behavior; markup and options are in `../../sirv-media-viewer/SKILL.md`. Use `autostart:created` only for above-fold viewers, and reserve layout space to avoid CLS.
 
 Useful Sirv JS options:
 
@@ -262,48 +158,7 @@ Use `../sirv-api/SKILL.md` for endpoint details.
 6. Rewrite app URLs to Sirv CDN paths and transform params/profiles.
 7. Verify rendered pages and Sirv responses.
 
-Operational details from the docs:
-
-- URL-encode file paths in API query strings.
-- Search returns up to 100 results per response.
-- Use `from` pagination for normal ranges; use scrolling search for more than 1000 results.
-- Scrolling search is a snapshot and is cached for about 20 minutes.
-- Escape Sirv search special characters in paths: `{ } / \ ! space`.
-- Watch response rate-limit headers on search/scroll endpoints.
-
-## Profiles And Defaults
-
-Use profiles for stable recipes shared by many pages:
-
-```json
-{
-  "image": {
-    "scale": {
-      "width": 500,
-      "height": 500,
-      "option": "fit"
-    },
-    "canvas": {
-      "width": 500,
-      "height": 500,
-      "color": "ffffff"
-    },
-    "format": "optimal",
-    "quality": 80
-  }
-}
-```
-
-Good profile candidates:
-
-- Product card square
-- Product detail zoom
-- Marketplace export
-- Watermarked download
-- Social preview
-- Blog/content thumbnail
-
-Keep one-off layout sizing in URL params. Keep brand or workflow policy in profiles/defaults.
+Path encoding, search pagination and scrolling, token expiry, and rate limits are in `../../sirv-api/SKILL.md`. Read it before you write the migration script.
 
 ## Product Media Workflow
 

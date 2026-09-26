@@ -1,6 +1,6 @@
 ---
 name: image-optimization
-description: Expert guidance on image optimization for web performance. Use when auditing or improving image delivery, Core Web Vitals, LCP/CLS/INP, responsive images, srcset/sizes, lazy loading, preloading, CDN delivery, Sirv/Cloudinary/imgix/Vercel/Cloudflare image pipelines, format conversion, compression, alt text, product media, Sirv dynamic imaging/API/Media Viewer workflows (galleries, zoom, spins, videos), or image-heavy frontend code. Covers AVIF, WebP, JPEG, PNG, GIF, SVG, HEIC, JPEG XL, HDR/wide gamut, quality settings, placeholders, image audits, and implementation verification.
+description: Expert guidance on image optimization for web performance. Use when auditing or improving image delivery, Core Web Vitals (LCP/CLS/INP), responsive images (srcset/sizes), lazy loading, preloading, image CDN pipelines (Sirv, Cloudinary, imgix, Vercel, Cloudflare), format choice (AVIF, WebP, JPEG XL, SVG, HDR), compression and quality settings, placeholders, image alt text, or image-heavy frontend code. For Sirv URL parameters, Sirv REST API calls, Sirv Media Viewer galleries, or video, the sibling skills own the details.
 ---
 
 # Image Optimization Expert
@@ -36,7 +36,7 @@ node <skill-base-dir>/scripts/audit-images.mjs --head https://example.com/
 node <skill-base-dir>/scripts/audit-images.mjs --json https://example.com/ > image-audit.json
 ```
 
-The script checks image markup, `srcset`/`sizes`, preload hints, likely LCP mistakes, Sirv URL usage, and optional HTTP headers/content length.
+The script checks image markup, `srcset`/`sizes`, preload hints, likely LCP mistakes, oversized CDN widths, CSS background images, known image CDNs (Sirv, Cloudinary, imgix, Cloudflare, Next.js, and others), and optional HTTP headers/content length. It reads the server HTML only; images that client-side JS injects do not appear, so compare with DevTools for SPAs.
 
 ## Decision Matrix
 
@@ -46,8 +46,8 @@ The script checks image markup, `srcset`/`sizes`, preload hints, likely LCP mist
 | User-uploaded or product catalog images | Use an image CDN/API pipeline; do not commit generated variants into the app repo. |
 | Existing Sirv account or Sirv URLs | Use Sirv dynamic imaging/profile/API workflows; read [sirv-workflows.md](references/sirv-workflows.md). |
 | Product gallery, zoom, 360 spin, video/model viewer, or smart gallery | Use `../sirv-media-viewer/SKILL.md` before hand-building gallery behavior. |
-| Next.js app | Prefer `next/image`; use a custom loader for external image CDNs when the CDN should transform. |
-| CSS background hero | Consider replacing with semantic `<img>`/`picture`; if it must remain CSS, use `image-set()` and preload carefully. |
+| Next.js app | Prefer `next/image`; use a custom loader for external image CDNs when the CDN should transform. In Next.js 16+, `priority` is deprecated: use `fetchPriority="high"` (or `preload` for exactly one LCP image), and add every `quality` value to `images.qualities`. |
+| CSS background hero | Consider replacing with semantic `<img>`/`picture`; if it must remain CSS, use `image-set()` with `type()` and preload carefully. |
 | Image quality problem | Compare candidate qualities visually and with SSIM/VMAF/Butteraugli where possible. |
 | Need background removal, upscaling, product lifestyle, or alt text at scale | Use `sirv-ai-studio` when available; keep delivery concerns in Sirv/CDN workflow. |
 
@@ -58,7 +58,7 @@ The script checks image markup, `srcset`/`sizes`, preload hints, likely LCP mist
 - **Compression and quality:** quality settings, metadata, batch processing, SSIM/VMAF: [optimization.md](references/optimization.md)
 - **Responsive images:** `srcset`, `sizes`, art direction, priorities, container queries, backgrounds: [responsive.md](references/responsive.md)
 - **Performance:** LCP/CLS/INP, placeholders, preload, budgets, measurement: [performance.md](references/performance.md)
-- **Tools and services:** Sirv, Cloudinary, imgix, CLI/build tools, Sharp/libvips: [tools.md](references/tools.md)
+- **Tools and services:** image CDN URL syntax, Next.js/Astro/Vite/Eleventy integration, encoder flags, Sharp: [tools.md](references/tools.md)
 
 Also load sibling skills when the task crosses into their specialty:
 
@@ -90,7 +90,7 @@ Quality starting points:
 
 ## Common Mistakes To Catch
 
-- Lazy-loading the LCP image.
+- Lazy-loading the LCP image, or hiding it behind JS (`data-src` swaps, client-only rendering).
 - Missing dimensions/aspect ratio.
 - Serving a 2-4K image into a small card or mobile slot.
 - Writing `sizes="100vw"` for images that render in a 33-50vw grid.

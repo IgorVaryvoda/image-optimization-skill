@@ -141,7 +141,12 @@ sizes="(min-width: 768px) 50vw, 100vw"
 
 <!-- Three-column on desktop -->
 sizes="(min-width: 1024px) 33vw, (min-width: 768px) 50vw, 100vw"
+
+<!-- Lazy image: browser measures the real layout width -->
+<img loading="lazy" sizes="auto, (min-width: 1024px) 33vw, 100vw" ...>
 ```
+
+`sizes="auto"` works only with `loading="lazy"` and only in Chromium 126+. Keep a normal `sizes` list after `auto` as the fallback for other browsers. Do not use it on the LCP image.
 
 ---
 

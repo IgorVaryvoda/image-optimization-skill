@@ -355,15 +355,15 @@
 - HDR and wide gamut support
 
 ### Browser Support
-- Chrome removed support (previously behind flag)
-- Firefox removed support
-- Safari 17+ (macOS/iOS)
-- NOT recommended for web use currently
+- Safari 17+ (macOS/iOS): on by default, but no animation and no progressive decoding
+- Chrome 145+ (Feb 2026): new Rust decoder (jxl-rs), behind `chrome://flags/#enable-jxl-image-format`, off by default
+- Firefox: Nightly only, behind `image.jxl.enabled`; not in stable builds
+- Edge: not documented
 
 ### Status
-- Promising format but adoption stalled
-- Use AVIF/WebP instead for web
-- May see renewed support in future
+- Chrome removed JPEG XL in 2023 and added it again behind a flag in 2026
+- Do not use it as the only format. Serve it only through `<picture>` with a `type="image/jxl"` source, or through CDN content negotiation
+- Check caniuse.com before recommending it; the status changes quickly
 
 ---
 
@@ -513,7 +513,7 @@ convert input.jpg -profile sRGB.icc -strip output.jpg
 
 ## Browser Support Matrix
 
-**Updated January 2026**
+**Updated September 2026**
 
 | Format | Chrome | Firefox | Safari | Edge | iOS Safari |
 |--------|--------|---------|--------|------|------------|
@@ -523,10 +523,10 @@ convert input.jpg -profile sRGB.icc -strip output.jpg
 | WebP | 17+ | 65+ | 14+ | 18+ | 14+ |
 | AVIF | 85+ | 93+ | 16.4+ | 121+ | 16.4+ |
 | SVG | Yes | Yes | Yes | Yes | Yes |
-| JPEG XL | No* | No* | 17+ | No | 17+ |
+| JPEG XL | Flag* | Nightly* | 17+ | No | 17+ |
 | HEIC | No | No | Yes | No | Yes |
 
-*Chrome/Firefox removed JPEG XL support; Safari 17+ supports it (macOS/iOS)
+*Chrome 145+ has JPEG XL behind a flag (off by default); Firefox has it only in Nightly. Safari 17+ supports it by default.
 
 ### Current Recommendations (2026)
 
@@ -536,7 +536,7 @@ convert input.jpg -profile sRGB.icc -strip output.jpg
 | 2nd | WebP | Universal fallback, good compression |
 | 3rd | JPEG/PNG | Legacy fallback for older browsers |
 
-### Global Support Percentages (approx. Jan 2026)
+### Global Support Percentages (approx. 2026; check caniuse.com)
 
 | Format | Global Support |
 |--------|----------------|
@@ -554,23 +554,19 @@ convert input.jpg -profile sRGB.icc -strip output.jpg
 </picture>
 ```
 
-For CSS backgrounds:
+For CSS backgrounds, use `image-set()` with `type()`. The browser takes the first type it can decode:
+
 ```css
 .hero {
   background-image: url('image.jpg');
-}
-
-@supports (background-image: url('test.webp')) {
-  .hero {
-    background-image: url('image.webp');
-  }
-}
-
-@supports (background-image: url('test.avif')) {
-  .hero {
-    background-image: url('image.avif');
-  }
+  background-image: image-set(
+    url('image.avif') type('image/avif'),
+    url('image.webp') type('image/webp'),
+    url('image.jpg') type('image/jpeg')
+  );
 }
 ```
 
-Or use JavaScript/server-side detection via Accept header.
+Do not use `@supports (background-image: url('x.webp'))`. `@supports` checks CSS syntax, not image decoder support, so it is true in every browser.
+
+Or let an image CDN negotiate the format from the `Accept` header, and keep one URL.

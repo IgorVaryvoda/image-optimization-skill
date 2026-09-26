@@ -28,7 +28,7 @@
 - Right-size images (don't serve 4K to mobile)
 - Serve from CDN with preconnect
 - Avoid lazy loading LCP images
-- Inline critical image CSS
+- Keep the LCP `<img>` in the server HTML; do not inject it with client-side JS
 
 ```html
 <!-- Resource hints for image CDN -->
@@ -95,9 +95,10 @@
 </style>
 ```
 
-### FID/INP (Interaction to Next Paint)
+### INP (Interaction to Next Paint)
 
-**What it measures:** Input responsiveness
+**What it measures:** Input responsiveness. INP replaced FID as a Core Web Vital in March 2024.
+**Target:** < 200 ms
 **Images impact:** Large image decoding can block main thread
 
 **Optimization strategies:**
@@ -181,40 +182,27 @@ Placeholders improve perceived performance by showing something immediately whil
 
 ### LQIP (Low Quality Image Placeholder)
 
-Generate a tiny, heavily compressed version of the image:
+Show a tiny, heavily compressed version as a CSS background behind the real image. The real `<img>` keeps its normal `src`/`srcset`, so the browser discovers it from HTML and LCP is not delayed by JS:
 
 ```html
-<div class="image-container">
-  <img
-    src="hero-lqip.jpg"
-    data-src="hero-full.jpg"
-    class="lqip-image"
-    alt="Hero"
-  >
+<div class="lqip" style="background-image: url('hero-lqip.jpg'); aspect-ratio: 16 / 9;">
+  <img src="hero.jpg" width="1600" height="900" alt="Hero">
 </div>
 ```
 
 ```css
-.lqip-image {
-  filter: blur(20px);
-  transition: filter 0.3s;
+.lqip {
+  background-size: cover;
 }
 
-.lqip-image.loaded {
-  filter: blur(0);
+.lqip img {
+  display: block;
+  width: 100%;
+  height: auto;
 }
 ```
 
-```javascript
-const img = document.querySelector('.lqip-image');
-const fullSrc = img.dataset.src;
-const fullImage = new Image();
-fullImage.onload = () => {
-  img.src = fullSrc;
-  img.classList.add('loaded');
-};
-fullImage.src = fullSrc;
-```
+Do not swap `data-src` into `src` with JS for the LCP image. The browser cannot discover the real URL until the script runs.
 
 **Generation with Sharp:**
 ```javascript
@@ -263,13 +251,6 @@ Extract the dominant color and use as placeholder background:
 ```javascript
 const { dominant } = await sharp('hero.jpg').stats();
 const color = `rgb(${dominant.r}, ${dominant.g}, ${dominant.b})`;
-```
-
-**With color-thief (browser/Node):**
-```javascript
-import ColorThief from 'color-thief';
-const colorThief = new ColorThief();
-const [r, g, b] = colorThief.getColor(img);
 ```
 
 ### Skeleton Loaders
@@ -382,20 +363,7 @@ HTML:
 <img data-src="photo.jpg" alt="Photo">
 ```
 
-### Libraries
-
-**lozad.js** - Minimal (1KB)
-```javascript
-import lozad from 'lozad';
-const observer = lozad();
-observer.observe();
-```
-
-**lazysizes** - Feature-rich
-```html
-<img data-src="photo.jpg" class="lazyload" alt="Photo">
-<script src="lazysizes.min.js" async></script>
-```
+Native `loading="lazy"` covers most cases. Lazy-loading libraries such as lazysizes are not needed in current browsers, and their `data-src` markup hides images from the preload scanner.
 
 ### Best Practices
 
@@ -476,15 +444,7 @@ observer.observe();
 3. **On-the-fly resize** - Generate sizes as needed
 4. **Reduced origin load** - CDN handles requests
 
-### Popular Image CDNs
-
-| CDN | URL Transform | Auto Format |
-|-----|---------------|-------------|
-| Sirv | `/image.jpg?w=800` | Yes |
-| Cloudinary | `/w_800/image.jpg` | Yes |
-| imgix | `/image.jpg?w=800` | Yes |
-| Cloudflare | `/cdn-cgi/image/width=800/image.jpg` | Yes |
-| Vercel | `/_next/image?url=/image.jpg&w=800` | Yes |
+URL syntax for each image CDN: see [tools.md](tools.md#image-cdn-url-syntax).
 
 ### Cache Headers
 
@@ -628,11 +588,11 @@ performance: {
 - Find LCP element
 - Check image decode time
 
-**Lighthouse:**
+**Lighthouse (13+):**
 - Run in incognito
-- Check "Properly size images"
-- Check "Serve images in modern formats"
-- Check "Efficiently encode images"
+- Check the "Improve image delivery" insight (`image-delivery-insight`). It replaces the old "Properly size images", "Serve images in modern formats", and "Efficiently encode images" audits.
+- Check the "LCP request discovery" insight (`lcp-discovery-insight`) for lazy-loaded or late-discovered LCP images.
+- Scripts or CI that use the old audit IDs need the new insight IDs.
 
 ### PageSpeed Insights
 
