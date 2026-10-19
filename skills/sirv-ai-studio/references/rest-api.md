@@ -4,7 +4,7 @@ Use the REST API for code integrations: scripts, backends, Zapier/n8n-style auto
 
 Base URL: `https://www.sirv.studio/api/zapier`
 
-All requests require: `Authorization: Bearer sk_live_YOUR_API_KEY`
+All requests require: `Authorization: Bearer $SIRV_STUDIO_KEY`. Keys start with `sk_live_`. Read the key from an environment variable; never commit it.
 
 Verified against the service source (July 2026). Credit costs are per model — see [mcp-tools.md](mcp-tools.md) for the cost tables; they apply to both surfaces.
 
@@ -256,7 +256,7 @@ Per-hour sliding window on write (processing) requests; reads (`/me`, `/batch/st
 
 ```javascript
 const SIRV_API = 'https://www.sirv.studio/api/zapier';
-const API_KEY = 'sk_live_YOUR_API_KEY';
+const API_KEY = process.env.SIRV_STUDIO_KEY;
 
 async function removeBackground(imageUrl) {
   const response = await fetch(`${SIRV_API}/remove-bg`, {
@@ -295,17 +295,17 @@ async function batchAltText(images) {
 ```bash
 # Remove background
 curl -X POST https://www.sirv.studio/api/zapier/remove-bg \
-  -H "Authorization: Bearer sk_live_YOUR_API_KEY" \
+  -H "Authorization: Bearer $SIRV_STUDIO_KEY" \
   -H "Content-Type: application/json" \
   -d '{"image_url": "https://example.com/product.jpg", "model": "birefnet"}'
 
 # Generate image
 curl -X POST https://www.sirv.studio/api/zapier/generate \
-  -H "Authorization: Bearer sk_live_YOUR_API_KEY" \
+  -H "Authorization: Bearer $SIRV_STUDIO_KEY" \
   -H "Content-Type: application/json" \
   -d '{"prompt": "Product photo of headphones", "model": "nano-banana-2", "aspect_ratio": "1:1"}'
 
 # Check credits
 curl https://www.sirv.studio/api/zapier/me \
-  -H "Authorization: Bearer sk_live_YOUR_API_KEY"
+  -H "Authorization: Bearer $SIRV_STUDIO_KEY"
 ```
