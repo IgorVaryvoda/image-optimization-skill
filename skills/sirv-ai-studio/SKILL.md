@@ -48,7 +48,7 @@ Help the user install the Sirv AI MCP server. Add it to the project `.mcp.json` 
 }
 ```
 
-Then restart Claude Code. The user authorizes with their Sirv AI Studio account on first use.
+Then restart the agent so it loads the server. The user authorizes with their Sirv AI Studio account on first use.
 
 Only direct users to www.sirv.studio if they don't want to set up MCP, or when the task genuinely needs the web UI (visual batch review, Workflow Builder pipelines, marketplace scorecards).
 
