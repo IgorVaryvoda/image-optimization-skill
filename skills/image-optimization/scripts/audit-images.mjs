@@ -504,7 +504,7 @@ function inspectSirvUrl(value) {
   return {
     hosted,
     hostname: url.hostname,
-    hasSizing: ["w", "h", "s", "thumbnail"].some((key) => params.has(key)),
+    hasSizing: ["w", "h", "s", "thumbnail"].some((param) => params.has(param)),
     hasProfile: params.has("profile"),
     hasQuality: params.has("q"),
     format,
@@ -717,7 +717,7 @@ function compactTag(tag) {
 
 function compactAttrs(attrs) {
   return Object.entries(attrs)
-    .map(([key, value]) => `${key}=${JSON.stringify(value)}`)
+    .map(([name, value]) => `${name}=${JSON.stringify(value)}`)
     .join(" ")
     .slice(0, 240);
 }
