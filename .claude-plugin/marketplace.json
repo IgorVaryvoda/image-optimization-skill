@@ -1,0 +1,15 @@
+{
+  "name": "imageguide",
+  "description": "Image and media skills from ImageGuide (imageguide.dev)",
+  "owner": {
+    "name": "Igor Varyvoda",
+    "url": "https://github.com/igorvaryvoda"
+  },
+  "plugins": [
+    {
+      "name": "sirv-media-skills",
+      "source": "./",
+      "category": "development"
+    }
+  ]
+}

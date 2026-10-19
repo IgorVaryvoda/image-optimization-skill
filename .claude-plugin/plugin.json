@@ -1,0 +1,13 @@
+{
+  "name": "sirv-media-skills",
+  "displayName": "Image & Media Skills",
+  "description": "Image and video optimization for web performance, plus Sirv dynamic imaging, REST API, Media Viewer, 360 spins, AI Studio, and e-commerce image workflows.",
+  "author": {
+    "name": "Igor Varyvoda",
+    "url": "https://github.com/igorvaryvoda"
+  },
+  "homepage": "https://www.imageguide.dev/tools/claude-skill/",
+  "repository": "https://github.com/igorvaryvoda/image-optimization-skill",
+  "license": "MIT",
+  "keywords": ["image-optimization", "video-optimization", "core-web-vitals", "responsive-images", "avif", "webp", "image-cdn", "sirv", "360-spin", "background-removal"]
+}
