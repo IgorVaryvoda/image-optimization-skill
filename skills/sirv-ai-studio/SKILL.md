@@ -32,7 +32,7 @@ The server exposes ~46 tools in total — beyond processing, there are asset man
 
 ### If MCP Tools Are NOT Available
 
-Help the user install the Sirv AI MCP server. Add to project `.mcp.json` or `~/.claude.json`:
+Help the user install the Sirv AI MCP server. Add it to the project `.mcp.json` (or the user-level MCP config of their agent):
 
 ```json
 {
